@@ -58,6 +58,30 @@ class QuestoesController extends Controller
             // Armazenando questão de única escolha
             if($questao->tipo_resposta == 'Única Escolha') {
                 for($i=0 ; $i<count($request->opcoes) ; $i++) {
+                    if($request->hasFile("imagem_$i")) {
+                        $imagem = $request->file("imagem_$i");
+                        $nome_imagem = time().'_'. $imagem->getClientOriginalName();
+                        $caminho_arquivo = public_path('imagens/opcoes') . '/' . $nome_imagem;
+                        $img = Image::make($imagem->path());
+                        $img->resize(350, 350, function ($const) {
+                            $const->aspectRatio();
+                        })->save($caminho_arquivo);
+
+                        if($i == $request->correta) {
+                            $opcao = Opcao::create([
+                                'texto' => $nome_imagem,
+                                'questao_id' => $questao->id,
+                                'correta' => true
+                            ]);
+                        } else {
+                            $opcao = Opcao::create([
+                                'texto' => $nome_imagem,
+                                'questao_id' => $questao->id,
+                                'correta' => false
+                            ]);
+                        }
+                    } 
+
                     if(isset($request->opcoes[$i]['texto'])) {
                         if($i == $request->correta) {
                             $opcao = Opcao::create([
@@ -112,22 +136,24 @@ class QuestoesController extends Controller
         //    'legenda' => "Figura 1"
         //]);
         
-        $numeracao_imagem = 1;
-        $imagens = $request->file('imagens');
-        foreach($imagens as $imagem) {
-            $nome_imagem = time().'_'. $imagem->getClientOriginalName();
-            $caminho_arquivo = public_path('imagens') . '/' . $nome_imagem;
-            $img = Image::make($imagem->path());
-            $img->resize(350, 350, function ($const) {
-                $const->aspectRatio();
-            })->save($caminho_arquivo);
-    
-            $nova_imagem = Imagem::create([
-                'caminho' => $nome_imagem,
-                'legenda' => "Figura $numeracao_imagem",
-                'questao_id' => $questao->id
-            ]);
-            $numeracao_imagem++;
+        if($request->hasFile('imagens')) {
+            $numeracao_imagem = 1;
+            $imagens = $request->file('imagens');
+            foreach($imagens as $imagem) {
+                $nome_imagem = time().'_'. $imagem->getClientOriginalName();
+                $caminho_arquivo = public_path('imagens/questoes') . '/' . $nome_imagem;
+                $img = Image::make($imagem->path());
+                $img->resize(350, 350, function ($const) {
+                    $const->aspectRatio();
+                })->save($caminho_arquivo);
+        
+                $nova_imagem = Imagem::create([
+                    'caminho' => $nome_imagem,
+                    'legenda' => "Figura $numeracao_imagem",
+                    'questao_id' => $questao->id
+                ]);
+                $numeracao_imagem++;
+            }
         }
 
 

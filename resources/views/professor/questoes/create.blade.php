@@ -163,6 +163,62 @@
         return String.fromCharCode(character.charCodeAt(0) + 1);
     }
 
+    function escolherTipoOpcao(opcao, div_id, i, letra) {
+        if(opcao == 'texto') {
+            $(div_id).replaceWith(opcaoUnicaEscolha(i, letra, opcao));
+        }
+        if(opcao == 'imagem') {
+            $(div_id).replaceWith(opcaoUnicaEscolha(i, letra, opcao));
+        }
+    }
+
+    function opcaoUnicaEscolha(i, letra, tipo) {
+        if(tipo == 'texto') {
+            let html = `
+            <div class='input-group mb-3' id='opcao_${i}'> 
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}')">Imagem</a>
+                    </div>
+                </div>
+                <textarea class='form-control' name='opcoes[${i}][texto]' placeholder='Alternativa ${letra}'></textarea>
+                <div class='input-group-prepend'>
+                    <span class='input-group-text'>
+                        <input type='radio' name='correta' value=${i}>
+                    </span>
+                </div>
+            </div>`;
+
+            return html;
+        }
+        if(tipo == 'imagem') {
+            let html = `
+            <div class='input-group mb-3' id='opcao_${i}'> 
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}')">Imagem</a>
+                    </div>
+                </div>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="opcoes[${i}][texto]" name="imagem_${i}">
+                    <label class="custom-file-label" for="opcoes[${i}][texto]">Choose file</label>
+                </div>
+                <div class='input-group-prepend'>
+                    <span class='input-group-text'>
+                        <input type='radio' name='correta' value=${i}>
+                    </span>
+                </div>
+            </div>`;
+
+            return html;
+        }
+        
+    }
+
     // opcoes
     $("#tipo_resposta").change(
         function() {
@@ -172,15 +228,7 @@
                 let opcoes = '';
                 let letra ='A';
                 for(let i = 0; i < 5; i++) {
-                        opcoes = opcoes + "<div class='input-group mb-3'>" +
-                            `<textarea class='form-control' name='opcoes[${i}][texto]' placeholder='Alternativa ${letra}'></textarea>` +
-                            "<div class='input-group-prepend'>" +
-                                "<span class='input-group-text'>" +
-                                    `<input type='radio' name='correta' value=${i}>` +
-                                "</span>" +
-                            "</div>" +
-                        "</div>" +
-                    "</div>";
+                    opcoes = opcoes + opcaoUnicaEscolha(i, letra, 'texto');
                     letra = nextChar(letra);
                 }
                 $("#opcoes_container" ).html("<label>Opções</label>" + opcoes);
@@ -188,7 +236,7 @@
                 let opcoes = '';
                 let letra ='A';
                 for(let i = 0; i < 5; i++) {
-                    opcoes = opcoes + "<div class='input-group mb-3'>" +
+                    opcoes = opcoes + "<div class='input-group mb-3'>" + dropdown +
                             `<textarea class='form-control' name='opcoes[${i}][texto]' placeholder='Alternativa ${letra}'></textarea>` +
                             "<span class='input-group-text'>" +
                                 `<input type='checkbox' name='opcoes[${i}][correta]'>` +
