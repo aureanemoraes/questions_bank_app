@@ -9,7 +9,7 @@ use App\Models\Matriz;
 use App\Models\Componente;
 use App\Models\Imagem;
 use App\Models\Opcao;
-
+use Image;
 use Illuminate\Support\Facades\Auth;
 
 class QuestoesController extends Controller
@@ -98,6 +98,38 @@ class QuestoesController extends Controller
         }
 
         // tratar imagens e armazenar
+
+        //$imagem = $request->file('imagens');
+        //$nome_imagem = time().'.'.$imagem->extension();
+        //$caminho_arquivo = public_path('imagens') . '/' . $nome_imagem;
+        //$img = Image::make($imagem->path());
+        //$img->resize(350, 350, function ($const) {
+        //    $const->aspectRatio();
+        //})->save($caminho_arquivo);
+//
+        //$nova_imagem = Imagem::create([
+        //    'caminho' => "$caminho_arquivo",
+        //    'legenda' => "Figura 1"
+        //]);
+        
+        $numeracao_imagem = 1;
+        $imagens = $request->file('imagens');
+        foreach($imagens as $imagem) {
+            $nome_imagem = time().'_'. $imagem->getClientOriginalName();
+            $caminho_arquivo = public_path('imagens') . '/' . $nome_imagem;
+            $img = Image::make($imagem->path());
+            $img->resize(350, 350, function ($const) {
+                $const->aspectRatio();
+            })->save($caminho_arquivo);
+    
+            $nova_imagem = Imagem::create([
+                'caminho' => $nome_imagem,
+                'legenda' => "Figura $numeracao_imagem",
+                'questao_id' => $questao->id
+            ]);
+            $numeracao_imagem++;
+        }
+
 
         return redirect()->route('questoes.show', [$questao]);
 

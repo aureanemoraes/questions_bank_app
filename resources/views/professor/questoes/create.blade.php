@@ -26,7 +26,7 @@
         </div>
 
         <div class="custom-file mb-3">
-            <input name="imagens" type="file" class="custom-file-input" id="imagens">
+            <input name="imagens[]" type="file" class="custom-file-input" id="imagens" multiple>
             <label class="custom-file-label" for="imagens" data-browse="Procurar">Selecione as imagens</label>
         </div>
         

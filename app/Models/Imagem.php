@@ -8,5 +8,5 @@ class Imagem extends Model
 {
     protected $table = 'imagens';
 
-    protected $fillable = ['caminho', 'legenda'];
+    protected $fillable = ['caminho', 'legenda', 'questao_id'];
 }

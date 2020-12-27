@@ -48,6 +48,12 @@
         <div class="row">
             {{$questao->comando}}
         </div>
+        @foreach($questao->imagens as $imagem)
+        <div class="row">
+                <img src="{{ asset("imagens/$imagem->caminho") }}" alt="a" class="img"><br>
+                <em>{{$imagem->legenda}}</em>
+        </div>
+        @endforeach
         @php
             $letra = 'a';
         @endphp

@@ -20,6 +20,11 @@ class Questao extends Model
     {
         return $this->hasMany('App\Models\Opcao');
     }
+    
+    public function imagens()
+    {
+        return $this->hasMany('App\Models\Imagem');
+    }
 
     public function matriz()
     {

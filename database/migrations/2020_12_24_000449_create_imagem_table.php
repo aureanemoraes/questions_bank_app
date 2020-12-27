@@ -17,6 +17,8 @@ class CreateImagemTable extends Migration
             $table->id();
             $table->string('caminho');
             $table->string('legenda');
+            $table->unsignedBigInteger('questao_id');
+            $table->foreign('questao_id')->references('id')->on('questoes');
             $table->timestamps();
         });
     }
