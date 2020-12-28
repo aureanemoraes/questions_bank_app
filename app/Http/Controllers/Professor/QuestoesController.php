@@ -20,7 +20,8 @@ class QuestoesController extends Controller
     }
 
     public function index() {
-
+        $questoes = Questao::all();
+        return view('professor.questoes.index', compact('questoes'));
     }
 
     public function create() {
@@ -58,15 +59,23 @@ class QuestoesController extends Controller
             // Armazenando questão de única escolha
             if($questao->tipo_resposta == 'Única Escolha') {
                 for($i=0 ; $i<count($request->opcoes) ; $i++) {
+                    // opcao com imagem
                     if($request->hasFile("imagem_$i")) {
                         $imagem = $request->file("imagem_$i");
                         $nome_imagem = time().'_'. $imagem->getClientOriginalName();
                         $caminho_arquivo = public_path('imagens/opcoes') . '/' . $nome_imagem;
-                        $img = Image::make($imagem->path());
-                        $img->resize(350, 350, function ($const) {
-                            $const->aspectRatio();
-                        })->save($caminho_arquivo);
-
+                        // Verificando tamanho da imagem
+                        $height = Image::make($imagem)->height();
+                        $width = Image::make($imagem)->width();
+                        if($height > 350 || $width >350) {
+                            $img = Image::make($imagem->path());
+                            $img->resize(350, 350, function ($const) {
+                                $const->aspectRatio();
+                            })->save($caminho_arquivo);
+                        } else {
+                            $img = Image::make($imagem->path())->save($caminho_arquivo); 
+                        }
+                    
                         if($i == $request->correta) {
                             $opcao = Opcao::create([
                                 'texto' => $nome_imagem,
@@ -81,7 +90,7 @@ class QuestoesController extends Controller
                             ]);
                         }
                     } 
-
+                    // opcao sem imagem
                     if(isset($request->opcoes[$i]['texto'])) {
                         if($i == $request->correta) {
                             $opcao = Opcao::create([
@@ -101,8 +110,41 @@ class QuestoesController extends Controller
             }
             // Armazenando questão de múltipla escolha
             if($questao->tipo_resposta == 'Múltipla Escolha') {
+                $i = 0;
                 foreach($request->opcoes as $item) {
-                    if($item['texto']) {
+                    // opcao com imagem
+                    if($request->hasFile("imagem_$i")) {
+                        $imagem = $request->file("imagem_$i");
+                        $nome_imagem = time().'_'. $imagem->getClientOriginalName();
+                        $caminho_arquivo = public_path('imagens/opcoes') . '/' . $nome_imagem;
+                        // Verificando tamanho da imagem
+                        $height = Image::make($imagem)->height();
+                        $width = Image::make($imagem)->width();
+                        if($height > 350 || $width >350) {
+                            $img = Image::make($imagem->path());
+                            $img->resize(350, 350, function ($const) {
+                                $const->aspectRatio();
+                            })->save($caminho_arquivo);
+                        } else {
+                            $img = Image::make($imagem->path())->save($caminho_arquivo); 
+                        }
+                    
+                        if(isset($item['correta'])) {
+                            $opcao = Opcao::create([
+                                'texto' => $nome_imagem,
+                                'questao_id' => $questao->id,
+                                'correta' => true
+                            ]);
+                        } else {
+                            $opcao = Opcao::create([
+                                'texto' => $nome_imagem,
+                                'questao_id' => $questao->id,
+                                'correta' => false
+                            ]);
+                        }
+                    }  
+                    // opcao sem imagem
+                    if(isset($item['texto'])) {
                         if(isset($item['correta'])) {
                             $opcao = Opcao::create([
                                 'texto' => $item['texto'],
@@ -117,42 +159,41 @@ class QuestoesController extends Controller
                             ]);
                         }
                     }
+                    $i++;
                 }
             }
         }
 
         // tratar imagens e armazenar
-
-        //$imagem = $request->file('imagens');
-        //$nome_imagem = time().'.'.$imagem->extension();
-        //$caminho_arquivo = public_path('imagens') . '/' . $nome_imagem;
-        //$img = Image::make($imagem->path());
-        //$img->resize(350, 350, function ($const) {
-        //    $const->aspectRatio();
-        //})->save($caminho_arquivo);
-//
-        //$nova_imagem = Imagem::create([
-        //    'caminho' => "$caminho_arquivo",
-        //    'legenda' => "Figura 1"
-        //]);
-        
         if($request->hasFile('imagens')) {
             $numeracao_imagem = 1;
             $imagens = $request->file('imagens');
             foreach($imagens as $imagem) {
                 $nome_imagem = time().'_'. $imagem->getClientOriginalName();
                 $caminho_arquivo = public_path('imagens/questoes') . '/' . $nome_imagem;
-                $img = Image::make($imagem->path());
-                $img->resize(350, 350, function ($const) {
-                    $const->aspectRatio();
-                })->save($caminho_arquivo);
-        
-                $nova_imagem = Imagem::create([
-                    'caminho' => $nome_imagem,
-                    'legenda' => "Figura $numeracao_imagem",
-                    'questao_id' => $questao->id
-                ]);
-                $numeracao_imagem++;
+                // Verificando tamanho da imagem
+                $height = Image::make($imagem)->height();
+                $width = Image::make($imagem)->width();
+                if($height > 350 || $width >350) {
+                    $img = Image::make($imagem->path());
+                    $img->resize(350, 350, function ($const) {
+                        $const->aspectRatio();
+                    })->save($caminho_arquivo);
+                    $nova_imagem = Imagem::create([
+                        'caminho' => $nome_imagem,
+                        'legenda' => "Figura $numeracao_imagem",
+                        'questao_id' => $questao->id
+                    ]);
+                    $numeracao_imagem++;
+                } else {
+                    $img = Image::make($imagem->path())->save($caminho_arquivo); 
+                    $nova_imagem = Imagem::create([
+                        'caminho' => $nome_imagem,
+                        'legenda' => "Figura $numeracao_imagem",
+                        'questao_id' => $questao->id
+                    ]);
+                    $numeracao_imagem++;
+                }
             }
         }
 

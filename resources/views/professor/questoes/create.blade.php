@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Questões')
+@section('title', 'Questões - Nova')
 
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
@@ -27,7 +27,7 @@
 
         <div class="custom-file mb-3">
             <input name="imagens[]" type="file" class="custom-file-input" id="imagens" multiple>
-            <label class="custom-file-label" for="imagens" data-browse="Procurar">Selecione as imagens</label>
+            <label class="custom-file-label" for="imagens" data-browse="Procurar">Selecione as imagens...</label>
         </div>
         
         <div class="alert alert-info" role="alert">
@@ -43,9 +43,6 @@
         <div class="form-group">
             <label for="nivel_dificuldade">Nível de dificuldade*</label>
             <select class="form-control" id="nivel_dificuldade" name="nivel_dificuldade">
-                <option value="Fácil">Fácil</option>
-                <option value="Intermediário">Intermediário</option>
-                <option value="Difícil">Difícil</option>
             </select>
         </div>
 
@@ -163,12 +160,14 @@
         return String.fromCharCode(character.charCodeAt(0) + 1);
     }
 
-    function escolherTipoOpcao(opcao, div_id, i, letra) {
+    function escolherTipoOpcao(opcao, div_id, i, letra, tipo_resposta) {
         if(opcao == 'texto') {
-            $(div_id).replaceWith(opcaoUnicaEscolha(i, letra, opcao));
+            if(tipo_resposta == 'Única Escolha') $(div_id).replaceWith(opcaoUnicaEscolha(i, letra, opcao));
+            if(tipo_resposta == 'Múltipla Escolha') $(div_id).replaceWith(opcaoMultiplaEscolha(i, letra, opcao));
         }
         if(opcao == 'imagem') {
-            $(div_id).replaceWith(opcaoUnicaEscolha(i, letra, opcao));
+            if(tipo_resposta == 'Única Escolha') $(div_id).replaceWith(opcaoUnicaEscolha(i, letra, opcao));
+            if(tipo_resposta == 'Múltipla Escolha') $(div_id).replaceWith(opcaoMultiplaEscolha(i, letra, opcao));
         }
     }
 
@@ -179,8 +178,8 @@
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}')">Texto</a>
-                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}')">Imagem</a>
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Imagem</a>
                     </div>
                 </div>
                 <textarea class='form-control' name='opcoes[${i}][texto]' placeholder='Alternativa ${letra}'></textarea>
@@ -199,13 +198,13 @@
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}')">Texto</a>
-                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}')">Imagem</a>
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Imagem</a>
                     </div>
                 </div>
                 <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="opcoes[${i}][texto]" name="imagem_${i}">
-                    <label class="custom-file-label" for="opcoes[${i}][texto]">Choose file</label>
+                    <input type="file" class="custom-file-input" id="imagem_${i}" name="imagem_${i}">
+                    <label class="custom-file-label" for="imagem_${i}" id="imagem_${i}_label" data-browse="Procurar">Selecione a imagem...</label>
                 </div>
                 <div class='input-group-prepend'>
                     <span class='input-group-text'>
@@ -213,12 +212,56 @@
                     </span>
                 </div>
             </div>`;
+            return html;
+        }   
+    }
+
+    function opcaoMultiplaEscolha(i, letra, tipo) {
+        if(tipo == 'texto') {
+            let html = `
+            <div class='input-group mb-3' id='opcao_${i}'> 
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Imagem</a>
+                    </div>
+                </div>
+                <textarea class='form-control' name='opcoes[${i}][texto]' placeholder='Alternativa ${letra}'></textarea> 
+                <div class='input-group-prepend'>
+                    <span class='input-group-text'>
+                        <input type='checkbox' name='opcoes[${i}][correta]'> 
+                    </span>
+                </div>
+            </div>`;
 
             return html;
         }
-        
+        if(tipo == 'imagem') {
+            let html = `
+            <div class='input-group mb-3' id='opcao_${i}'> 
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Imagem</a>
+                    </div>
+                </div>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="imagem_${i}" name="imagem_${i}">
+                    <label class="custom-file-label" for="imagem_${i}" id="imagem_${i}_label" data-browse="Procurar">Selecione a imagem...</label>
+                </div>
+                <div class='input-group-prepend'>
+                    <span class='input-group-text'>
+                        <input type='checkbox' name='opcoes[${i}][correta]'> 
+                    </span>
+                </div>
+            </div>`;
+            return html;
+        }
     }
 
+    
     // opcoes
     $("#tipo_resposta").change(
         function() {
@@ -232,17 +275,12 @@
                     letra = nextChar(letra);
                 }
                 $("#opcoes_container" ).html("<label>Opções</label>" + opcoes);
+                
             } else if(tipo_resposta == 'Múltipla Escolha') {
                 let opcoes = '';
                 let letra ='A';
                 for(let i = 0; i < 5; i++) {
-                    opcoes = opcoes + "<div class='input-group mb-3'>" + dropdown +
-                            `<textarea class='form-control' name='opcoes[${i}][texto]' placeholder='Alternativa ${letra}'></textarea>` +
-                            "<span class='input-group-text'>" +
-                                `<input type='checkbox' name='opcoes[${i}][correta]'>` +
-                            "</span>" +
-                        "</div>" +
-                    "</div>";
+                    opcoes = opcoes + opcaoMultiplaEscolha(i, letra, 'texto');
                     letra = nextChar(letra);
                 }
                 $("#opcoes_container" ).html("<label>Opções</label>" + opcoes);
@@ -251,6 +289,24 @@
             }
         }
     );
+
+    // exibindo as imagens selecionadas
+    $('.custom-file input').change(function (e) {
+        var files = [];
+        for (var i = 0; i < $(this)[0].files.length; i++) {
+            files.push($(this)[0].files[i].name);
+        }
+        $(this).next('.custom-file-label').html(files.join(', '));
+    });
+
+    $("#opcoes_container").on('change', '.custom-file input', function(){
+        var files = [];
+        for (var i = 0; i < $(this)[0].files.length; i++) {
+            files.push($(this)[0].files[i].name);
+        }
+        $(this).next('.custom-file-label').html(files.join(', '));
+    });
+    // fim: exibindo as imagens selecionadas
 
     $(function() {
         // tipo resposta
