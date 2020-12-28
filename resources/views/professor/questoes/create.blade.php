@@ -16,13 +16,14 @@
 @stop
 
 @section('content')
-    <form action="{{route('questoes.store')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{route('questoes.store')}}" method="POST" enctype="multipart/form-data" id="nova_questao">
         @csrf
-        <div class="input-group mb-3">
+        <div class="form-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">Comando*</span>
             </div>
-            <textarea name="comando" class="form-control" aria-label="Comando" rows="6"></textarea>
+            <textarea name="comando" class="form-control" aria-label="Comando" rows="6" required></textarea>
+            <div class="invalid-feedback"></div>
         </div>
 
         <div class="custom-file mb-3">
@@ -36,8 +37,9 @@
 
         <div class="form-group">
             <label for="tipo_resposta">Tipo de resposta*</label>
-            <select class="form-control" id="tipo_resposta" name="tipo_resposta">
+            <select class="form-control" id="tipo_resposta" name="tipo_resposta" required>
             </select>
+            <div class="invalid-feedback"></div>
         </div>
 
         <div class="form-group">
@@ -123,8 +125,23 @@
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
     <script>
+    jQuery.validator.setDefaults({
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
+    });
 
+    $('#nova_questao').validate();
     // função
     function carregarOpcoes(url, id) {
         $.ajax({
@@ -135,7 +152,12 @@
                     theme: 'classic',
                     width: '100%',
                     height: '100%',
-                    data: opcoes
+                    data: [{
+                        id: '',
+                        text: 'Selecione...',
+                        selected: true,
+                        disabled: true
+                    }, ...opcoes]
                 });
             }
         });
@@ -316,6 +338,12 @@
             height: '100%',
             data: [
                 {
+                    id: '',
+                    text: 'Selecione...',
+                    selected: true,
+                    disabled: true
+                },
+                {
                     id: 'Discursiva',
                     text: 'Discursiva'
                 },
@@ -336,6 +364,12 @@
             width: '100%',
             height: '100%',
             data: [
+                {
+                    id: '',
+                    text: 'Selecione...',
+                    selected: true,
+                    disabled: true
+                },
                 {
                     id: 'Fácil',
                     text: 'Fácil'

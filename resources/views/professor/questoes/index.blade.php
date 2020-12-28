@@ -8,6 +8,12 @@
         a {
             cursor: pointer;
         }
+
+        .toggle-vis {
+            color: white !important;
+        }
+
+
     </style>
 @stop
 
@@ -89,12 +95,28 @@
             });
 
             let table = $('#questoes').DataTable({
+                "columnDefs": [
+            {
+                "targets": [2, 3, 6, 7],
+                "visible": false
+            }
+        ],
                 initComplete: function () {
                     // columns seach
                     this.api().columns([0, 2, 3, 4, 5, 7]).every( function (d) {
                         var column = this;
-                        var theadname = $("#questoes th").eq([d]).text(); //used this specify table name and head
-                        var select = $('<select><option value="">' + theadname + '</option></select>')
+                        var theadname = [
+                            'ID', 
+                            'Comando', 
+                            'Tipo de resposta',
+                            'Nível de dificuldade',
+                            'Matriz',
+                            'Componente',
+                            'Assunto',
+                            'Área de Conhecimento (ENEM)',
+                            'Ações'
+                        ] //used this specify table name and head
+                        var select = $('<select><option value="">' + theadname[d] + '</option></select>')
                             .appendTo( $(column.footer()).empty() )
                             .on( 'change', function () {
                                 var val = $.fn.dataTable.util.escapeRegex(
@@ -123,7 +145,8 @@
                     } );
                 }
             } );
-        
+            // Colunas iniciais visiveis
+            
             $('a.toggle-vis').on( 'click', function (e) {
                 e.preventDefault();
                 // Get the column API object
