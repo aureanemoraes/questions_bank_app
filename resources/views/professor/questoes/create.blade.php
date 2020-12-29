@@ -8,7 +8,9 @@
         .input-group-text {
             width: 100px;
         }  
-    </style>
+        .has-error ~ .select2 .select2-selection {
+  border: 1px solid red !important;
+}  </style>
 @stop
 
 @section('content_header')
@@ -20,10 +22,9 @@
         @csrf
         <div class="form-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text">Comando*</span>
+                <label for="Comando">Comando*</label>
             </div>
-            <textarea name="comando" class="form-control" aria-label="Comando" rows="6" required></textarea>
-            <div class="invalid-feedback"></div>
+            <textarea name="comando" class="form-control" aria-label="Comando" rows="6"></textarea>
         </div>
 
         <div class="custom-file mb-3">
@@ -37,9 +38,8 @@
 
         <div class="form-group">
             <label for="tipo_resposta">Tipo de resposta*</label>
-            <select class="form-control" id="tipo_resposta" name="tipo_resposta" required>
+            <select class="form-control" id="tipo_resposta" name="tipo_resposta">
             </select>
-            <div class="invalid-feedback"></div>
         </div>
 
         <div class="form-group">
@@ -102,46 +102,42 @@
             </div>
         </div>
     </div>
-
-    <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;" >
-        <!-- Position it -->
-        <div style="position: absolute; top: 0; right: 0;">
-            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="assunto_salvo_sucesso" data-autohide="false">
-                <div class="toast-header">
-                    <i class="fas fa-check-square" style="margin: 2px;color:green"></i>
-                    <strong class="mr-auto" style="color:green">Sucesso!</strong>
-                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="toast-body">
-                    Novo assunto adicionado.
-                </div>
-            </div>
-        </div>
-    </div>
-
 @stop
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
     jQuery.validator.setDefaults({
-        errorElement: 'span',
+        errorElement: 'div',
         errorPlacement: function (error, element) {
             error.addClass('invalid-feedback');
             element.closest('.form-group').append(error);
-        },
-        highlight: function (element, errorClass, validClass) {
-            $(element).addClass('is-invalid');
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element).removeClass('is-invalid');
         }
     });
 
-    $('#nova_questao').validate();
+    $('#nova_questao').validate({
+        rules: {
+            comando: "required",
+            tipo_resposta: "required",
+            nivel_dificuldade: "required",
+            matriz_id: "required",
+            componente_id: "required",
+            assunto_id: "required",
+        },
+        messages: {
+            comando: "Por favor, insira um <b>comando</b>.",
+            tipo_resposta: "Por favor, selecione um <b>tipo de resposta</b>.",
+            nivel_dificuldade: "Por favor, selecione um <b>nível de dificuldade</b>.",
+            matriz_id: "Por favor, selecione uma <b>matriz</b>.",
+            componente_id: "Por favor, selecione um <b>vomponente</b>.",
+            assunto_id: "Por favor, selecione um <b>assunto</b>.",
+        }
+    });
+
+    
     // função
     function carregarOpcoes(url, id) {
         $.ajax({
@@ -169,10 +165,13 @@
             url: '/api/assuntos',
             data: {nome: $('#nome_novo_assunto').val()},
             success: function() {
-                carregarOpcoes('/api/assuntos', 'assunto');
-                $('#assunto_salvo_sucesso').toast('show');
+                carregarOpcoes('/api/assuntos', 'assunto_id');
                 $('#novo_assunto').modal('hide');
-
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso!',
+                    text: 'Assunto criado com sucesso!',
+                });
             },
         });
     }
@@ -282,8 +281,7 @@
             return html;
         }
     }
-
-    
+  
     // opcoes
     $("#tipo_resposta").change(
         function() {

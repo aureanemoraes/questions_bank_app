@@ -95,6 +95,9 @@
             });
 
             let table = $('#questoes').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.10.22/i18n/Portuguese-Brasil.json"
+                },
                 "columnDefs": [
             {
                 "targets": [2, 3, 6, 7],

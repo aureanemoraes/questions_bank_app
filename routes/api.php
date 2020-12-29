@@ -22,3 +22,7 @@ Route::get('/matrizes', 'Api\MatrizesController@opcoes');
 Route::get('/componentes', 'Api\ComponentesController@opcoes');
 Route::get('/assuntos', 'Api\AssuntosController@opcoes');
 Route::post('/assuntos', 'Api\AssuntosController@store');
+Route::post('/imagens', 'Api\ImagemController@store');
+Route::delete('/imagens/{id}', 'Api\ImagemController@destroy');
+
+

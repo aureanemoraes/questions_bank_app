@@ -106,7 +106,7 @@
     <div class="card-footer">
     <div class="row">
     <div class="col">
-                <a type="button" class="btn btn-warning" href="">Editar</a>
+            <a type="button" class="btn btn-warning" href="{{route('questoes.edit', $questao)}}">Editar</a>
             </div>
             <div class="col" align="right">
                 <a type="button" class="btn btn-light" href="">Adicionar</a>

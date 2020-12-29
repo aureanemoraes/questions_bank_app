@@ -207,8 +207,9 @@ class QuestoesController extends Controller
         return view('professor.questoes.show', compact('questao'));
     }
 
-    public function edit() {
-
+    public function edit($id) {
+        $questao = Questao::find($id);
+        return view('professor.questoes.edit', compact('questao'));
     }
 
     public function update() {
