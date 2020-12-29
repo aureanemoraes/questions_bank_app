@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Opcao extends Model
 {
     protected $table = 'opcoes';
-    protected $fillable = ['texto', 'correta', 'questao_id'];
+    protected $fillable = ['texto', 'correta', 'questao_id', 'imagem'];
 }

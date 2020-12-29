@@ -80,13 +80,15 @@ class QuestoesController extends Controller
                             $opcao = Opcao::create([
                                 'texto' => $nome_imagem,
                                 'questao_id' => $questao->id,
-                                'correta' => true
+                                'correta' => true,
+                                'imagem' => true
                             ]);
                         } else {
                             $opcao = Opcao::create([
                                 'texto' => $nome_imagem,
                                 'questao_id' => $questao->id,
-                                'correta' => false
+                                'correta' => false,
+                                'imagem' => true
                             ]);
                         }
                     } 
@@ -133,13 +135,15 @@ class QuestoesController extends Controller
                             $opcao = Opcao::create([
                                 'texto' => $nome_imagem,
                                 'questao_id' => $questao->id,
-                                'correta' => true
+                                'correta' => true,
+                                'imagem' => true
                             ]);
                         } else {
                             $opcao = Opcao::create([
                                 'texto' => $nome_imagem,
                                 'questao_id' => $questao->id,
-                                'correta' => false
+                                'correta' => false,
+                                'imagem' => true
                             ]);
                         }
                     }  
@@ -209,6 +213,7 @@ class QuestoesController extends Controller
 
     public function edit($id) {
         $questao = Questao::find($id);
+        $questao->load('opcoes');
         return view('professor.questoes.edit', compact('questao'));
     }
 

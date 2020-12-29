@@ -20,6 +20,7 @@ class CreateOpcoesTable extends Migration
             $table->unsignedBigInteger('questao_id');
             $table->foreign('questao_id')->references('id')->on('questoes');
             $table->boolean('correta')->default(false);
+            $table->boolean('imagem')->default(false);
             $table->timestamps();
         });
     }
