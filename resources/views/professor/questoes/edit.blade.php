@@ -29,8 +29,8 @@
 
 @section('content')
     <form action="{{route('questoes.update', $questao)}}" method="POST" enctype="multipart/form-data" id="editar_questao">
-        <input type="hidden" name="_METHOD" value="PUT">
         @csrf
+        @method('put')
         <div class="form-group mb-3">
             <div class="input-group-prepend">
                 <label for="Comando">Comando*</label>
@@ -162,6 +162,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal: nova_opcao -->
+    <div class="modal fade" id="adicionar_opcao" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="adicionar_opcao_label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adicionar_opcao_label">Alterar legenda</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="adicionar_opcao_modal_body">
+                ///
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="salvar_imagem_modal">Salvar</button>
+            </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('js')
@@ -199,6 +220,18 @@
     let questao = JSON.parse($('#questao').val());
     console.log(questao);
     // função
+    function adicionarOpcao() {
+        let tipo_resposta = $('#tipo_resposta').val();
+        if(tipo_resposta == 'Única Escolha') {
+            let html = opcaoUnicaEscolha('texto');
+            $('#adicionar_opcao_modal_body').html(html);
+        } else {
+            let html = opcaoMultiplaEscolha('texto');
+            $('#adicionar_opcao_modal_body').html(html);
+        }
+        $('#adicionar_opcao').modal('show');
+    }
+
     function excluirImagem(imagem_id) {
         Swal.fire({
             title: 'Confirmação',
@@ -301,32 +334,32 @@
         return String.fromCharCode(character.charCodeAt(0) + 1);
     }
 
-    function escolherTipoOpcao(opcao, div_id, i, letra, tipo_resposta) {
+    function escolherTipoOpcao(opcao, tipo_resposta) {
         if(opcao == 'texto') {
-            if(tipo_resposta == 'Única Escolha') $(div_id).replaceWith(opcaoUnicaEscolha(i, letra, opcao, questao.opcoes[i] && questao.opcoes[i]));
-            if(tipo_resposta == 'Múltipla Escolha') $(div_id).replaceWith(opcaoMultiplaEscolha(i, letra, opcao,questao.opcoes[i] && questao.opcoes[i]));
+            if(tipo_resposta == 'Única Escolha') $('#nova_opcao').replaceWith(opcaoUnicaEscolha(opcao));
+            if(tipo_resposta == 'Múltipla Escolha') $('#nova_opcao').replaceWith(opcaoMultiplaEscolha(opcao));
         }
         if(opcao == 'imagem') {
-            if(tipo_resposta == 'Única Escolha') $(div_id).replaceWith(opcaoUnicaEscolha(i, letra, opcao, questao.opcoes[i] && questao.opcoes[i]));
-            if(tipo_resposta == 'Múltipla Escolha') $(div_id).replaceWith(opcaoMultiplaEscolha(i, letra, opcao, questao.opcoes[i] && questao.opcoes[i]));
+            if(tipo_resposta == 'Única Escolha') $('#nova_opcao').replaceWith(opcaoUnicaEscolha(opcao));
+            if(tipo_resposta == 'Múltipla Escolha') $('#nova_opcao').replaceWith(opcaoMultiplaEscolha(opcao));
         }
     }
 
-    function opcaoUnicaEscolha(i, letra, tipo, opcao = '') {
+    function opcaoUnicaEscolha(tipo) {
         if(tipo == 'texto') {
             let html = `
-            <div class='input-group mb-3' id='opcao_${i}'> 
+            <div class='input-group mb-3' id='nova_opcao'> 
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Texto</a>
-                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Imagem</a>
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
                     </div>
                 </div>
-                <textarea class='form-control' name='opcoes[${i}][texto]' placeholder='Alternativa ${letra}'>${opcao && opcao.texto}</textarea>
+                <textarea class='form-control' name='nova_opcao' placeholder='Nova alternativa...'></textarea>
                 <div class='input-group-prepend'>
                     <span class='input-group-text'>
-                        <input type='radio' name='correta' value=${i} ${(opcao && opcao.correta) && 'checked'}>
+                        <input type='radio' name='correta'>
                     </span>
                 </div>
             </div>`;
@@ -334,69 +367,44 @@
             return html;
         }
         if(tipo == 'imagem') {
-            if(opcao.imagem) {
-                let html = `
-                <div class='input-group mb-3 imagem' id='opcao_${i}'> 
+            let html = `
+                <div class='input-group mb-3 imagem' id='nova_opcao'> 
                     <div class="input-group-prepend imagem">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Texto</a>
-                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Imagem</a>
+                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
+                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
                         </div>
                     </div>
                     <div class="custom-file" imagem>
-                        <input type="file" class="custom-file-input" id="imagem_${i}" name="imagem_${i}" >
-                        <label class="custom-file-label imagem" for="imagem_${i}" id="imagem_${i}_label" data-browse="Procurar"><img src="/imagens/opcoes/${opcao.texto}" width="100px;" length="100px"/></label>
+                        <input type="file" class="custom-file-input" id="imagem_nova_opcao" name="nova_opcao" >
+                        <label class="custom-file-label imagem" for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
                     </div>
                     <div class='input-group-prepend' imagem>
                         <span class='input-group-text'>
-                            <input type='radio' name='correta' value=${i} ${(opcao && opcao.correta) && 'checked'}>
+                            <input type='radio' name='correta'}>
                         </span>
                     </div>
                 </div>`;
-                return html;
-            } else {
-                let html = `
-                <div class='input-group mb-3 imagem' id='opcao_${i}'> 
-                    <div class="input-group-prepend imagem">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Texto</a>
-                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Única Escolha')">Imagem</a>
-                        </div>
-                    </div>
-                    <div class="custom-file" imagem>
-                        <input type="file" class="custom-file-input" id="imagem_${i}" name="imagem_${i}" >
-                        <label class="custom-file-label imagem" for="imagem_${i}" id="imagem_${i}_label" data-browse="Procurar">Procurar imagem...</label>
-                    </div>
-                    <div class='input-group-prepend' imagem>
-                        <span class='input-group-text'>
-                            <input type='radio' name='correta' value=${i} ${(opcao && opcao.correta) && 'checked'}>
-                        </span>
-                    </div>
-                </div>`;
-                return html;
-            }
-            
+            return html;
         }   
     }
 
-    function opcaoMultiplaEscolha(i, letra, tipo, opcao = '') {
-        ////
+    function opcaoMultiplaEscolha(tipo) {
         if(tipo == 'texto') {
             let html = `
-            <div class='input-group mb-3' id='opcao_${i}'> 
+            <div class='input-group mb-3' id='nova_opcao'> 
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Texto</a>
-                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Imagem</a>
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
                     </div>
                 </div>
-                <textarea class='form-control' name='opcoes[${i}][texto]' placeholder='Alternativa ${letra}'>${opcao && opcao.texto}</textarea> 
+                <textarea class='form-control' name='nova_opcao' placeholder='Nova alternativa...'></textarea>
                 <div class='input-group-prepend'>
                     <span class='input-group-text'>
-                        <input type='checkbox' name='opcoes[${i}][correta]' ${(opcao && opcao.correta) && 'checked'}> 
+                        <input type='checkbox' name='correta'>
                     </span>
                 </div>
             </div>`;
@@ -404,102 +412,28 @@
             return html;
         }
         if(tipo == 'imagem') {
-            if(opcao.imagem) {
-                let html = `
-                <div class='input-group mb-3 imagem' id='opcao_${i}'> 
+            let html = `
+                <div class='input-group mb-3 imagem' id='nova_opcao'> 
                     <div class="input-group-prepend imagem">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Texto</a>
-                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Imagem</a>
+                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
+                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
                         </div>
                     </div>
-                    <div class="custom-file imagem">
-                        <input type="file" class="custom-file-input" id="imagem_${i}" name="imagem_${i}">
-                        <label class="custom-file-label imagem" for="imagem_${i}" id="imagem_${i}_label" data-browse="Procurar"><img src="/imagens/opcoes/${opcao.texto}" width="100px;" length="100px"/></label>
+                    <div class="custom-file" imagem>
+                        <input type="file" class="custom-file-input" id="imagem_nova_opcao" name="nova_opcao" >
+                        <label class="custom-file-label imagem" for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
                     </div>
-                    <div class='input-group-prepend imagem'>
+                    <div class='input-group-prepend' imagem>
                         <span class='input-group-text'>
-                            <input type='checkbox' name='opcoes[${i}][correta]' ${(opcao && opcao.correta) && 'checked'}> 
+                            <input type='checkbox' name='correta'}>
                         </span>
                     </div>
                 </div>`;
-                return html;
-            } else {
-                let html = `
-                <div class='input-group mb-3 imagem' id='opcao_${i}'> 
-                    <div class="input-group-prepend imagem">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Texto</a>
-                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', '#opcao_${i}', '${i}', '${letra}', 'Múltipla Escolha')">Imagem</a>
-                        </div>
-                    </div>
-                    <div class="custom-file imagem">
-                        <input type="file" class="custom-file-input" id="imagem_${i}" name="imagem_${i}">
-                        <label class="custom-file-label imagem" for="imagem_${i}" id="imagem_${i}_label" data-browse="Procurar">Procurar imagem...</label>
-                    </div>
-                    <div class='input-group-prepend imagem'>
-                        <span class='input-group-text'>
-                            <input type='checkbox' name='opcoes[${i}][correta]' ${(opcao && opcao.correta) && 'checked'}> 
-                        </span>
-                    </div>
-                </div>`;
-                return html;
-            }
-            
-        }   
-        ///
+            return html;
+        } 
     }
-  
-    // opcoes
-    $("#tipo_resposta").change(
-        function() {
-            let tipo_resposta = $('#tipo_resposta').val();
-
-            if(tipo_resposta == 'Única Escolha') {
-                let opcoes = '';
-                let letra ='A';
-                for(let i = 0; i < 5; i++) {
-                    let opcao = questao.opcoes[i];
-                    if(opcao) {
-                        if(opcao.imagem) {
-                            opcoes = opcoes + opcaoUnicaEscolha(i, letra, 'imagem', opcao);
-                            letra = nextChar(letra);
-                        } else {
-                            opcoes = opcoes + opcaoUnicaEscolha(i, letra, 'texto', opcao);
-                            letra = nextChar(letra);
-                        }  
-                    } else {
-                        opcoes = opcoes + opcaoUnicaEscolha(i, letra, 'texto', opcao);
-                        letra = nextChar(letra);
-                    }
-                }
-                $("#opcoes_container" ).html("<label>Opções</label>" + opcoes);
-            } else if(tipo_resposta == 'Múltipla Escolha') {
-                let opcoes = '';
-                let letra ='A';
-                for(let i = 0; i < 5; i++) {
-                    let opcao = questao.opcoes[i];
-                    if(opcao) {
-                        if(opcao.imagem) {
-                            opcoes = opcoes + opcaoMultiplaEscolha(i, letra, 'imagem', opcao);
-                            letra = nextChar(letra);
-                        } else {
-                            opcoes = opcoes + opcaoMultiplaEscolha(i, letra, 'texto', opcao);
-                            letra = nextChar(letra);
-                        }  
-                    } else {
-                        opcoes = opcoes + opcaoMultiplaEscolha(i, letra, 'texto', opcao);
-                        letra = nextChar(letra);
-                    }
-                }
-                $("#opcoes_container" ).html("<label>Opções</label>" + opcoes);
-            } else {
-                $("#opcoes_container" ).html( "");
-            }
-        }
-    );
 
     // exibindo as imagens selecionadas
     $('.custom-file input').change(function (e) {
@@ -595,45 +529,38 @@
 
         // opções
         if(questao.opcoes.length > 0) {
-            console.log('tem alternativas');
-            if(questao.tipo_resposta == 'Única Escolha') {
-                let opcoes = '';
-                let letra ='A';
-                for(let i = 0; i < 5; i++) {
-                    let opcao = questao.opcoes[i];
-                    if(opcao) {
-                        if(opcao.imagem) {
-                            opcoes = opcoes + opcaoUnicaEscolha(i, letra, 'imagem', opcao);
-                            letra = nextChar(letra);
-                        } else {
-                            opcoes = opcoes + opcaoUnicaEscolha(i, letra, 'texto', opcao);
-                            letra = nextChar(letra);
-                        }  
+            let table = `
+                <label>Alternativas</label>
+                <table class="table table-primary table-sm table-bordered" id="tabela_opcoes">
+            `;
+            for(let i=0 ; i<5 ; i++) {
+                if(questao.opcoes[i]) {
+                    if(questao.opcoes[i].imagem) {
+                        table += `
+                            <tr id="opcao_${questao.opcoes[i].id}">
+                                <td><img class="imagem" src="/imagens/opcoes/${questao.opcoes[i].texto}"/></td>
+                                <td><a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a></td>
+                                ${questao.opcoes[i].correta && '<td><i class="fas fa-check-circle" style="color:green"></i></td>'}
+                            </tr>
+                        `;
                     } else {
-                        opcoes = opcoes + opcaoUnicaEscolha(i, letra, 'texto', opcao);
+                        table += `
+                            <tr id="opcao_${questao.opcoes[i].id}">
+                                <td>${questao.opcoes[i].texto}</td>
+                                <td><a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a></td>
+                                ${questao.opcoes[i].correta && '<td><i class="fas fa-check-circle" style="color:green"></i></td>'}
+                            </tr>
+                        `;
                     }
                 }
-                $("#opcoes_container" ).html("<label>Opções</label>" + opcoes);
             }
-            if(questao.tipo_resposta == 'Múltipla Escolha') {
-                let opcoes = '';
-                let letra ='A';
-                for(let i = 0; i < 5; i++) {
-                    let opcao = questao.opcoes[i];
-                    if(opcao) {
-                        if(opcao.imagem) {
-                            opcoes = opcoes + opcaoMultiplaEscolha(i, letra, 'imagem', opcao);
-                            letra = nextChar(letra);
-                        } else {
-                            opcoes = opcoes + opcaoMultiplaEscolha(i, letra, 'texto', opcao);
-                            letra = nextChar(letra);
-                        }  
-                    } else {
-                        opcoes = opcoes + opcaoMultiplaEscolha(i, letra, 'texto', opcao);
-                    }
-                }
-                $("#opcoes_container" ).html("<label>Opções</label>" + opcoes);
-            }
+            table += `</table>`;
+
+            let button_nova_opcao = `
+                <a type="button" class="btn btn-sm btn-link" onclick="adicionarOpcao()">Nova opção</a>
+            `;
+            $('#opcoes_container').html(table + button_nova_opcao);
+
         }
     });
 </script>

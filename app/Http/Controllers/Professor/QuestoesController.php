@@ -58,7 +58,7 @@ class QuestoesController extends Controller
         if($request->opcoes) {
             // Armazenando questão de única escolha
             if($questao->tipo_resposta == 'Única Escolha') {
-                for($i=0 ; $i<count($request->opcoes) ; $i++) {
+                for($i=0 ; $i<5 ; $i++) {
                     // opcao com imagem
                     if($request->hasFile("imagem_$i")) {
                         $imagem = $request->file("imagem_$i");
