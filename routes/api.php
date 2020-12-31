@@ -25,6 +25,8 @@ Route::post('/assuntos', 'Api\AssuntosController@store');
 Route::post('/imagens', 'Api\ImagemController@store');
 Route::post('/opcoes/{questao_id}', 'Api\OpcoesController@store');
 Route::delete('/imagens/{id}', 'Api\ImagemController@destroy');
+Route::delete('/opcoes/{id}', 'Api\OpcoesController@destroy');
+
 
 
 

@@ -190,11 +190,10 @@
                     </button>
                 </div>
                 <div class="modal-body" id="adicionar_opcao_modal_body">
-                <form name="teste"></form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" id="salvar_imagem_modal" onclick="adicionarOpcao()">Salvar</button>
+                    <button type="button" class="btn btn-primary" id="but_upload">Salvar</button>
             </div>
             </div>
         </div>
@@ -235,23 +234,62 @@
     });
 
     let questao = JSON.parse($('#questao').val());
-    console.log(questao);
-    // função
-    function adicionarOpcao() {
-        var fd = new FormData();
-        fd.append('nova_opcao', $('#nova_opcao').val());
-        fd.append('correta', $('#correta').val());
 
-        
+    // função
+    $("#but_upload").click(function(){
+        let fd = new FormData();
+        let files = '';
+        if(typeof $('#nova_opcao_imagem')[0] != 'undefined') {
+            files = $('#nova_opcao_imagem')[0].files;
+
+        }
+
+        fd.append('nova_opcao', $('#nova_opcao').val());
+        if($('#correta').is(':checked')) { 
+            fd.append('correta', true);
+        }
+
+        // Check file selected or not
+        if(files.length > 0 ) {
+            fd.append('nova_opcao_imagem', files[0]);
+        }
+
         $.ajax({
             type: 'POST',
             url: `/api/opcoes/${questao.id}`,
             data: fd,
             processData: false,
-    contentType: false,
+            contentType: false,
             success: function(data) {
                 $('#adicionar_opcao').modal('hide');
-                console.log(data);
+                let opcao = '';
+                if(data.imagem) {
+                    opcao += `
+                        <div id="opcao_${data.id}" class="row align-middle opcao imagem-container ${data.correta && 'bg-lime'}">
+                            <div class="col-8">
+                                <img class="imagem" src="/imagens/opcoes/${data.texto}"/>
+                            </div>
+                            <div class="col-1">
+                                ${data.correta ? '<i class="fas fa-check-circle" style="color:green"></i>' : ''}
+                            </div>
+                            <div class="col-3">
+                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')" style="color:white">Excluir</a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    opcao += `
+                        <div id="opcao_${data.id}" class="row opcao ${data.correta && 'bg-lime'}">
+                            <div class="col-8">${data.texto}</div>
+                            <div class="col-1">${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
+                            <div class="col-3">
+                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${data.id}')" style="color:white">Alterar</a>
+                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')" style="color:white">Excluir</a>
+                            </div>
+                        </div>
+                    `;
+                }
+                $('#opcoes_container').append(opcao);
 
                 Swal.fire({
                     icon: 'success',
@@ -260,6 +298,35 @@
                 });
             },
         });
+        
+    });
+
+    function excluirOpcao(opcao_id) {
+        Swal.fire({
+            title: 'Confirmação',
+            text: "Você tem certeza que deseja excluir essa alternativa?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, tenho certeza!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "DELETE",
+                    url: `/api/opcoes/${opcao_id}`,
+                    success: function() {
+                        $(`#opcao_${opcao_id}`).remove();
+
+                        Swal.fire(
+                            'Sucessso!',
+                            'Alternativa excluída com sucesso.',
+                            'success'
+                        );
+                    },
+                });
+            }
+        })
     }
 
     function adicionarOpcaoModal() {
@@ -401,7 +468,7 @@
                 <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'></textarea>
                 <div class='input-group-prepend'>
                     <span class='input-group-text'>
-                        <input type='radio' name='correta'>
+                        <input type='radio' name='correta' id="correta">
                     </span>
                 </div>
             </div>`;
@@ -419,12 +486,12 @@
                         </div>
                     </div>
                     <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="imagem_nova_opcao" name="nova_opcao_imagem" id="nova_opcao_imagem" >
+                        <input type="file" class="custom-file-input" name="nova_opcao_imagem" id="nova_opcao_imagem" >
                         <label class="custom-file-label " for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
                     </div>
                     <div class='input-group-prepend'>
                         <span class='input-group-text'>
-                            <input type='radio' name='correta'>
+                            <input type='radio' name='correta' id="correta">
                         </span>
                     </div>
                 </div>`;
@@ -446,7 +513,7 @@
                 <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'></textarea>
                 <div class='input-group-prepend'>
                     <span class='input-group-text'>
-                        <input type='checkbox' name='correta'>
+                        <input type='checkbox' name='correta' id="correta">
                     </span>
                 </div>
             </div>`;
@@ -464,12 +531,12 @@
                         </div>
                     </div>
                     <div class="custom-file" >
-                        <input type="file" class="custom-file-input" id="imagem_nova_opcao" name="nova_opcao_imagem" id="nova_opcao_imagem">
+                        <input type="file" class="custom-file-input" name="nova_opcao_imagem" id="nova_opcao_imagem">
                         <label class="custom-file-label" for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
                     </div>
                     <div class='input-group-prepend'>
                         <span class='input-group-text'>
-                            <input type='checkbox' name='correta'}>
+                            <input type='checkbox' name='correta' id="correta"}>
                         </span>
                     </div>
                 </div>`;
@@ -573,12 +640,13 @@
         if(questao.opcoes.length > 0) {
             let opcao = `
                 <label>Alternativas</label>
+                <a type="button" class="btn btn-sm btn-link" onclick="adicionarOpcaoModal()">Nova opção</a>
             `;
             for(let i=0 ; i<questao.opcoes.length ; i++) {
                 if(questao.opcoes[i]) {
                     if(questao.opcoes[i].imagem) {
                         opcao += `
-                            <div id="opcao_${questao.opcoes[i].id}" class="row align-middle opcao imagem-container ">
+                            <div id="opcao_${questao.opcoes[i].id}" class="row align-middle opcao imagem-container ${questao.opcoes[i].correta && 'bg-lime'}">
                                 <div class="col-8">
                                     <img class="imagem" src="/imagens/opcoes/${questao.opcoes[i].texto}"/>
                                 </div>
@@ -592,11 +660,11 @@
                         `;
                     } else {
                         opcao += `
-                            <div id="opcao_${questao.opcoes[i].id}" class="row opcao ">
+                            <div id="opcao_${questao.opcoes[i].id}" class="row opcao ${questao.opcoes[i].correta && 'bg-lime'}">
                                 <div class="col-8">${questao.opcoes[i].texto}</div>
                                 <div class="col-1">${questao.opcoes[i].correta ? '<i class="fas fa-check-circle" style="color:green"></i>' : ''}</div>
                                 <div class="col-3">
-                                    <a type="button" class="btn btn-sm btn-warning" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Alterar</a>
+                                    <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${questao.opcoes[i].id}')" style="color:white">Alterar</a>
                                     <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a>
                                 </div>
                             </div>
@@ -605,10 +673,7 @@
                 }
             }
 
-            let button_nova_opcao = `
-                <a type="button" class="btn btn-sm btn-link" onclick="adicionarOpcaoModal()">Nova opção</a>
-            `;
-            $('#opcoes_container').html(opcao + button_nova_opcao);
+            $('#opcoes_container').html(opcao);
 
         }
     });

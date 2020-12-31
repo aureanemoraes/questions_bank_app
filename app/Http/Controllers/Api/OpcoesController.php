@@ -13,22 +13,19 @@ class OpcoesController extends Controller
         if($request->hasFile('nova_opcao_imagem')) {
             $nome_imagem = $this->salvarImagem($request->file('nova_opcao_imagem'));
             if($request->correta) {
-                //$opcao = Opcao::create([
-                //    'texto' => $nome_imagem,
-                //    'questao_id' => $questao_id,
-                //    'correta' => true,
-                //    'imagem' => true
-                //]);
-                return 'ok';
+                $opcao = Opcao::create([
+                    'texto' => $nome_imagem,
+                    'questao_id' => $questao_id,
+                    'correta' => true,
+                    'imagem' => true
+                ]);
             } else {
-                //$opcao = Opcao::create([
-                //    'texto' => $nome_imagem,
-                //    'questao_id' => $questao_id,
-                //    'correta' => false,
-                //    'imagem' => true
-                //]);
-                return 'ok';
-
+                $opcao = Opcao::create([
+                    'texto' => $nome_imagem,
+                    'questao_id' => $questao_id,
+                    'correta' => false,
+                    'imagem' => true
+                ]);
             }
         } else {
             if($request->correta) {
@@ -49,6 +46,22 @@ class OpcoesController extends Controller
         }
 
         return $opcao;
+    }
+
+    public function destroy($id) {
+        $opcao = Opcao::find($id);
+        if($opcao) {
+            if($opcao->imagem) {
+                if(file_exists(public_path("imagens/opcoes/$opcao->texto"))){
+                    unlink(public_path("imagens/opcoes/$opcao->texto"));
+                }
+                $opcao->delete();
+                return 1;
+            } else {
+                $opcao->delete();
+                return 1;
+            }
+        }
     }
 
     private function salvarImagem($imagem) {

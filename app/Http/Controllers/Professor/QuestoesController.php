@@ -191,7 +191,60 @@ class QuestoesController extends Controller
         return view('professor.questoes.edit', compact('questao'));
     }
 
-    public function update() {
+    public function update($id, Request $request) {
+        $questao = Questao::find($id);
+
+        // área de conhecimento
+        $matriz = Matriz::find($request->matriz_id);
+        $componente = Componente::find($request->componente_id);
+        $area_conhecimento = $this->definirAreaConhecimento($matriz->nome, $componente->nome); 
+
+        $questao->array_fill_keys([
+            'comando' => $request->comando,
+            'tipo_resposta' => $request->tipo_resposta,
+            'nivel_dificuldade' => $request->nivel_dificuldade,
+            'matriz_id' => $request->matriz_id,
+            'componente_id' => $request->componente_id,
+            'assunto_id' => $request->assunto_id,
+            'area_conhecimento_id' => $area_conhecimento
+        ]);
+        $questao->save();
+
+        // tratar imagens e armazenar
+        if($request->hasFile('imagens')) {
+            $numeracao_imagem = 1;
+            $imagens = $request->file('imagens');
+            foreach($imagens as $imagem) {
+                $nome_imagem = time().'_'. $imagem->getClientOriginalName();
+                $caminho_arquivo = public_path('imagens/questoes') . '/' . $nome_imagem;
+                // Verificando tamanho da imagem
+                $height = Image::make($imagem)->height();
+                $width = Image::make($imagem)->width();
+                if($height > 350 || $width >350) {
+                    $img = Image::make($imagem->path());
+                    $img->resize(350, 350, function ($const) {
+                        $const->aspectRatio();
+                    })->save($caminho_arquivo);
+                    $nova_imagem = Imagem::create([
+                        'caminho' => $nome_imagem,
+                        'legenda' => "Figura $numeracao_imagem",
+                        'questao_id' => $questao->id
+                    ]);
+                    $numeracao_imagem++;
+                } else {
+                    $img = Image::make($imagem->path())->save($caminho_arquivo); 
+                    $nova_imagem = Imagem::create([
+                        'caminho' => $nome_imagem,
+                        'legenda' => "Figura $numeracao_imagem",
+                        'questao_id' => $questao->id
+                    ]);
+                    $numeracao_imagem++;
+                }
+            }
+        }
+        
+        return redirect()->route('questoes.show', [$questao]);
+
 
     }
 
