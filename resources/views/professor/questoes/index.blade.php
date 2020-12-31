@@ -34,51 +34,53 @@
         <a type="button" class="btn btn-primary toggle-vis" data-column="8">Ações</a>
 
     </div>
-    <table id="questoes" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Comando</th>
-                <th>Tipo de resposta</th>
-                <th>Nível de dificuldade</th>
-                <th>Matriz</th>
-                <th>Componente</th>
-                <th>Assunto</th>
-                <th>Área de Conhecimento (ENEM)</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($questoes as $questao)
-            <tr>
-                <td>{{$questao->id}}</td>
-                <td>{{$questao->comando}}</td>
-                <td>{{$questao->tipo_resposta}}</td>
-                <td>{{$questao->nivel_dificuldade}}</td>
-                <td>{{$questao->matriz->nome}}</td>
-                <td>{{$questao->componente->nome}}</td>
-                <td>{{$questao->assunto->nome}}</td>
-                <td>{{$questao->area_conhecimento->nome}}</td>
-                <td>
-                    <a type="button" class="btn btn-sm btn-info" href="{{route('questoes.show', $questao)}}">Ver</a>
-                    <a type="button" class="btn btn-sm btn-danger" href="{{route('questoes.destroy', $questao)}}">Excluir</a>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-        <tfoot>
-            <tr>
-                <th></th>
-                <th class="pesquisavel"></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th class="pesquisavel"></th>
-                <th></th>
-                <th></th>
-        </tfoot>
-    </table>
+    <div class="table-responsive">
+        <table id="questoes" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Comando</th>
+                    <th>Tipo de resposta</th>
+                    <th>Nível de dificuldade</th>
+                    <th>Matriz</th>
+                    <th>Componente</th>
+                    <th>Assunto</th>
+                    <th>Área de Conhecimento (ENEM)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($questoes as $questao)
+                <tr>
+                    <td>{{$questao->id}}</td>
+                    <td>{{$questao->comando}}</td>
+                    <td>{{$questao->tipo_resposta}}</td>
+                    <td>{{$questao->nivel_dificuldade}}</td>
+                    <td>{{$questao->matriz->nome}}</td>
+                    <td>{{$questao->componente->nome}}</td>
+                    <td>{{$questao->assunto->nome}}</td>
+                    <td>{{$questao->area_conhecimento->nome}}</td>
+                    <td>
+                        <a type="button" class="btn btn-sm btn-info" href="{{route('questoes.show', $questao)}}">Ver</a>
+                        <a type="button" class="btn btn-sm btn-danger" href="{{route('questoes.destroy', $questao)}}">Excluir</a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th class="pesquisavel"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th class="pesquisavel"></th>
+                    <th></th>
+                    <th></th>
+            </tfoot>
+        </table>
+    </div>
 @stop
 
 

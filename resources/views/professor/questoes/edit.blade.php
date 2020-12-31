@@ -17,8 +17,22 @@
             border: 4px solid white;
         }
 
+        .imagem-container {
+            height: 110px;
+        }
         .imagem {
-            height: 120px;
+            max-height: 100px;
+            max-width: 100px;
+        }
+
+        .opcao {
+            display: flex;
+            align-items: center;
+            background: #0275d8;
+            color: white;
+            margin: 4px;
+            border-radius: 4px;
+            padding: 4px;
         }
     </style>
 @stop
@@ -38,27 +52,29 @@
             <textarea name="comando" class="form-control" aria-label="Comando" rows="6">{{$questao->comando}}</textarea>
         </div>
         @if(count($questao->imagens) > 0)
-            <table class="table table-sm table-bordered">
-                <thead class="bg-primary">
-                    <tr>
-                        <th scope="col">Imagem</th>
-                        <th scope="col">Legenda</th>
-                        <th scope="col">Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach($questao->imagens as $imagem)
-                    <tr id="linha_{{$imagem->id}}">
-                        <td><img src="{{asset("imagens/questoes/$imagem->caminho")}}" alt="{{$imagem->legenda}}"></td>
-                        <td id="legenda_{{$imagem->id}}">{{$imagem->legenda}}</td>
-                        <td>
-                            <a type="button" class="btn btn-sm btn-warning" onclick="alterarLegendaModal({{$imagem->id}})">Alterar legenda</a>
-                            <a type="button" class="btn btn-sm btn-danger" onclick="excluirImagem({{$imagem->id}})">Excluir</a>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead class="bg-primary">
+                        <tr>
+                            <th scope="col">Imagem</th>
+                            <th scope="col">Legenda</th>
+                            <th scope="col">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($questao->imagens as $imagem)
+                        <tr id="linha_{{$imagem->id}}">
+                            <td><img src="{{asset("imagens/questoes/$imagem->caminho")}}" alt="{{$imagem->legenda}}"></td>
+                            <td id="legenda_{{$imagem->id}}">{{$imagem->legenda}}</td>
+                            <td>
+                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarLegendaModal({{$imagem->id}})">Alterar legenda</a>
+                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirImagem({{$imagem->id}})">Excluir</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
         <div class="custom-file mb-3">
             <input name="imagens[]" type="file" class="custom-file-input" id="imagens" multiple>
@@ -104,7 +120,7 @@
             </a>
         </div>
 
-        <div id="opcoes_container"></div>
+        <div id="opcoes_container" class="container"></div>
         
         <a type="button" class="btn btn-default">Cancelar</a>
         <button type="submit" class="btn btn-primary">Salvar</button>
@@ -529,37 +545,44 @@
 
         // opções
         if(questao.opcoes.length > 0) {
-            let table = `
+            let opcao = `
                 <label>Alternativas</label>
-                <table class="table table-primary table-sm table-bordered" id="tabela_opcoes">
             `;
             for(let i=0 ; i<5 ; i++) {
                 if(questao.opcoes[i]) {
                     if(questao.opcoes[i].imagem) {
-                        table += `
-                            <tr id="opcao_${questao.opcoes[i].id}">
-                                <td><img class="imagem" src="/imagens/opcoes/${questao.opcoes[i].texto}"/></td>
-                                <td><a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a></td>
-                                ${questao.opcoes[i].correta && '<td><i class="fas fa-check-circle" style="color:green"></i></td>'}
-                            </tr>
+                        opcao += `
+                            <div id="opcao_${questao.opcoes[i].id}" class="row align-middle opcao imagem-container ">
+                                <div class="col-8">
+                                    <img class="imagem" src="/imagens/opcoes/${questao.opcoes[i].texto}"/>
+                                </div>
+                                <div class="col-1">
+                                    ${questao.opcoes[i].correta ? '<i class="fas fa-check-circle" style="color:green"></i>' : ''}
+                                </div>
+                                <div class="col-3">
+                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a>
+                                </div>
+                            </div>
                         `;
                     } else {
-                        table += `
-                            <tr id="opcao_${questao.opcoes[i].id}">
-                                <td>${questao.opcoes[i].texto}</td>
-                                <td><a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a></td>
-                                ${questao.opcoes[i].correta && '<td><i class="fas fa-check-circle" style="color:green"></i></td>'}
-                            </tr>
+                        opcao += `
+                            <div id="opcao_${questao.opcoes[i].id}" class="row opcao ">
+                                <div class="col-8">${questao.opcoes[i].texto}</div>
+                                <div class="col-1">${questao.opcoes[i].correta ? '<i class="fas fa-check-circle" style="color:green"></i>' : ''}</div>
+                                <div class="col-3">
+                                    <a type="button" class="btn btn-sm btn-warning" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Alterar</a>
+                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a>
+                                </div>
+                            </div>
                         `;
                     }
                 }
             }
-            table += `</table>`;
 
             let button_nova_opcao = `
                 <a type="button" class="btn btn-sm btn-link" onclick="adicionarOpcao()">Nova opção</a>
             `;
-            $('#opcoes_container').html(table + button_nova_opcao);
+            $('#opcoes_container').html(opcao + button_nova_opcao);
 
         }
     });
