@@ -190,11 +190,11 @@
                     </button>
                 </div>
                 <div class="modal-body" id="adicionar_opcao_modal_body">
-                ///
+                <form name="teste"></form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" id="salvar_imagem_modal">Salvar</button>
+                    <button type="button" class="btn btn-primary" id="salvar_imagem_modal" onclick="adicionarOpcao()">Salvar</button>
             </div>
             </div>
         </div>
@@ -206,6 +206,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
+   
     jQuery.validator.setDefaults({
         errorElement: 'div',
         errorPlacement: function (error, element) {
@@ -237,6 +238,31 @@
     console.log(questao);
     // função
     function adicionarOpcao() {
+        var fd = new FormData();
+        fd.append('nova_opcao', $('#nova_opcao').val());
+        fd.append('correta', $('#correta').val());
+
+        
+        $.ajax({
+            type: 'POST',
+            url: `/api/opcoes/${questao.id}`,
+            data: fd,
+            processData: false,
+    contentType: false,
+            success: function(data) {
+                $('#adicionar_opcao').modal('hide');
+                console.log(data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso!',
+                    text: 'Alternativa adicionada.',
+                });
+            },
+        });
+    }
+
+    function adicionarOpcaoModal() {
         let tipo_resposta = $('#tipo_resposta').val();
         if(tipo_resposta == 'Única Escolha') {
             let html = opcaoUnicaEscolha('texto');
@@ -352,19 +378,19 @@
 
     function escolherTipoOpcao(opcao, tipo_resposta) {
         if(opcao == 'texto') {
-            if(tipo_resposta == 'Única Escolha') $('#nova_opcao').replaceWith(opcaoUnicaEscolha(opcao));
-            if(tipo_resposta == 'Múltipla Escolha') $('#nova_opcao').replaceWith(opcaoMultiplaEscolha(opcao));
+            if(tipo_resposta == 'Única Escolha') $('#nova_opcao_div').replaceWith(opcaoUnicaEscolha(opcao));
+            if(tipo_resposta == 'Múltipla Escolha') $('#nova_opcao_div').replaceWith(opcaoMultiplaEscolha(opcao));
         }
         if(opcao == 'imagem') {
-            if(tipo_resposta == 'Única Escolha') $('#nova_opcao').replaceWith(opcaoUnicaEscolha(opcao));
-            if(tipo_resposta == 'Múltipla Escolha') $('#nova_opcao').replaceWith(opcaoMultiplaEscolha(opcao));
+            if(tipo_resposta == 'Única Escolha') $('#nova_opcao_div').replaceWith(opcaoUnicaEscolha(opcao));
+            if(tipo_resposta == 'Múltipla Escolha') $('#nova_opcao_div').replaceWith(opcaoMultiplaEscolha(opcao));
         }
     }
 
     function opcaoUnicaEscolha(tipo) {
         if(tipo == 'texto') {
             let html = `
-            <div class='input-group mb-3' id='nova_opcao'> 
+            <div class='input-group mb-3' id='nova_opcao_div'> 
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                     <div class="dropdown-menu">
@@ -372,7 +398,7 @@
                         <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
                     </div>
                 </div>
-                <textarea class='form-control' name='nova_opcao' placeholder='Nova alternativa...'></textarea>
+                <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'></textarea>
                 <div class='input-group-prepend'>
                     <span class='input-group-text'>
                         <input type='radio' name='correta'>
@@ -384,21 +410,21 @@
         }
         if(tipo == 'imagem') {
             let html = `
-                <div class='input-group mb-3 imagem' id='nova_opcao'> 
-                    <div class="input-group-prepend imagem">
+                <div class='input-group mb-3 imagem-div' id='nova_opcao_div'> 
+                    <div class="input-group-prepend">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
                             <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
                         </div>
                     </div>
-                    <div class="custom-file" imagem>
-                        <input type="file" class="custom-file-input" id="imagem_nova_opcao" name="nova_opcao" >
-                        <label class="custom-file-label imagem" for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="imagem_nova_opcao" name="nova_opcao_imagem" id="nova_opcao_imagem" >
+                        <label class="custom-file-label " for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
                     </div>
-                    <div class='input-group-prepend' imagem>
+                    <div class='input-group-prepend'>
                         <span class='input-group-text'>
-                            <input type='radio' name='correta'}>
+                            <input type='radio' name='correta'>
                         </span>
                     </div>
                 </div>`;
@@ -409,15 +435,15 @@
     function opcaoMultiplaEscolha(tipo) {
         if(tipo == 'texto') {
             let html = `
-            <div class='input-group mb-3' id='nova_opcao'> 
+            <div class='input-group mb-3' id='nova_opcao_div'> 
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
-                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
+                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Múltipla Escolha')">Texto</a>
+                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Múltipla Escolha')">Imagem</a>
                     </div>
                 </div>
-                <textarea class='form-control' name='nova_opcao' placeholder='Nova alternativa...'></textarea>
+                <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'></textarea>
                 <div class='input-group-prepend'>
                     <span class='input-group-text'>
                         <input type='checkbox' name='correta'>
@@ -429,19 +455,19 @@
         }
         if(tipo == 'imagem') {
             let html = `
-                <div class='input-group mb-3 imagem' id='nova_opcao'> 
-                    <div class="input-group-prepend imagem">
+                <div class='input-group mb-3 imagem-div' id='nova_opcao_div'> 
+                    <div class="input-group-prepend">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
-                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
+                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Múltipla Escolha')">Texto</a>
+                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Múltipla Escolha')">Imagem</a>
                         </div>
                     </div>
-                    <div class="custom-file" imagem>
-                        <input type="file" class="custom-file-input" id="imagem_nova_opcao" name="nova_opcao" >
-                        <label class="custom-file-label imagem" for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
+                    <div class="custom-file" >
+                        <input type="file" class="custom-file-input" id="imagem_nova_opcao" name="nova_opcao_imagem" id="nova_opcao_imagem">
+                        <label class="custom-file-label" for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
                     </div>
-                    <div class='input-group-prepend' imagem>
+                    <div class='input-group-prepend'>
                         <span class='input-group-text'>
                             <input type='checkbox' name='correta'}>
                         </span>
@@ -548,7 +574,7 @@
             let opcao = `
                 <label>Alternativas</label>
             `;
-            for(let i=0 ; i<5 ; i++) {
+            for(let i=0 ; i<questao.opcoes.length ; i++) {
                 if(questao.opcoes[i]) {
                     if(questao.opcoes[i].imagem) {
                         opcao += `
@@ -580,7 +606,7 @@
             }
 
             let button_nova_opcao = `
-                <a type="button" class="btn btn-sm btn-link" onclick="adicionarOpcao()">Nova opção</a>
+                <a type="button" class="btn btn-sm btn-link" onclick="adicionarOpcaoModal()">Nova opção</a>
             `;
             $('#opcoes_container').html(opcao + button_nova_opcao);
 

@@ -61,21 +61,8 @@ class QuestoesController extends Controller
                 for($i=0 ; $i<5 ; $i++) {
                     // opcao com imagem
                     if($request->hasFile("imagem_$i")) {
-                        $imagem = $request->file("imagem_$i");
-                        $nome_imagem = time().'_'. $imagem->getClientOriginalName();
-                        $caminho_arquivo = public_path('imagens/opcoes') . '/' . $nome_imagem;
-                        // Verificando tamanho da imagem
-                        $height = Image::make($imagem)->height();
-                        $width = Image::make($imagem)->width();
-                        if($height > 350 || $width >350) {
-                            $img = Image::make($imagem->path());
-                            $img->resize(350, 350, function ($const) {
-                                $const->aspectRatio();
-                            })->save($caminho_arquivo);
-                        } else {
-                            $img = Image::make($imagem->path())->save($caminho_arquivo); 
-                        }
-                    
+                        $nome_imagem = $this->salvarImagem($request->file("imagem_$i"));
+
                         if($i == $request->correta) {
                             $opcao = Opcao::create([
                                 'texto' => $nome_imagem,
@@ -116,21 +103,8 @@ class QuestoesController extends Controller
                 foreach($request->opcoes as $item) {
                     // opcao com imagem
                     if($request->hasFile("imagem_$i")) {
-                        $imagem = $request->file("imagem_$i");
-                        $nome_imagem = time().'_'. $imagem->getClientOriginalName();
-                        $caminho_arquivo = public_path('imagens/opcoes') . '/' . $nome_imagem;
-                        // Verificando tamanho da imagem
-                        $height = Image::make($imagem)->height();
-                        $width = Image::make($imagem)->width();
-                        if($height > 350 || $width >350) {
-                            $img = Image::make($imagem->path());
-                            $img->resize(350, 350, function ($const) {
-                                $const->aspectRatio();
-                            })->save($caminho_arquivo);
-                        } else {
-                            $img = Image::make($imagem->path())->save($caminho_arquivo); 
-                        }
-                    
+                        $nome_imagem = $this->salvarImagem($request->file("imagem_$i"));
+
                         if(isset($item['correta'])) {
                             $opcao = Opcao::create([
                                 'texto' => $nome_imagem,
@@ -247,5 +221,23 @@ class QuestoesController extends Controller
                 break;
             }
         }
+    }
+
+    private function salvarImagem($imagem) {
+        $nome_imagem = time().'_'. $imagem->getClientOriginalName();
+        $caminho_arquivo = public_path('imagens/opcoes') . '/' . $nome_imagem;
+        // Verificando tamanho da imagem
+        $height = Image::make($imagem)->height();
+        $width = Image::make($imagem)->width();
+        if($height > 350 || $width >350) {
+            $img = Image::make($imagem->path());
+            $img->resize(350, 350, function ($const) {
+                $const->aspectRatio();
+            })->save($caminho_arquivo);
+        } else {
+            $img = Image::make($imagem->path())->save($caminho_arquivo); 
+        }
+
+        return $nome_imagem;        
     }
 }
