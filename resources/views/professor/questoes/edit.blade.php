@@ -115,7 +115,7 @@
             <select class="form-control" id="assunto_id" name="assunto_id">
             </select>
             <!-- Novo assunto -->
-            <a type="button" class="btn btn-link" role="button" data-toggle="modal" data-target="#novo_assunto">
+            <a type="button" class="btn btn-sm text-info" onclick="novoAssuntoModal()">
                 Novo assunto
             </a>
         </div>
@@ -126,75 +126,20 @@
         <button type="submit" class="btn btn-primary">Salvar</button>
     </form>
 
-
-    <!-- Modal: novo assunto -->
-    <div class="modal fade" id="novo_assunto" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="novo_assunto_label" aria-hidden="true">
+    <!-- Modal: genérico -->
+    <div class="modal fade" id="modal_generico" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modal_generico_label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="novo_assunto_label">Novo assunto</h5>
+                    <h5 class="modal-title" id="modal_generico_label">Alterar legenda</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="novo_assunto_input">Nome</span>
-                        </div>
-                        <input type="text" class="form-control" aria-label="Username" aria-describedby="novo_assunto_input" id="nome_novo_assunto">
-                    </div>
+                <div class="modal-body" id="modal_generico_body">
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" onclick="salvarNovoAssunto()">Salvar</button>
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: alterar legenda imagem -->
-    <div class="modal fade" id="alterar_legenda_imagem" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="alterar_legenda_imagem_label" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="alterar_legenda_imagem_label">Alterar legenda</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-footer" id="modal_generico_footer">
                 </div>
-                <div class="modal-body">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="alterar_legenda_imagem_input">Legenda</span>
-                        </div>
-                        <input type="text" class="form-control" aria-label="Username" placeholder="Insira aqui..." aria-describedby="alterar_legenda_imagem_input" id="nova_legenda">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" id="salvar_imagem_modal">Salvar</button>
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: nova_opcao -->
-    <div class="modal fade" id="adicionar_opcao" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="adicionar_opcao_label" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="adicionar_opcao_label">Alterar legenda</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="adicionar_opcao_modal_body">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" id="but_upload">Salvar</button>
-            </div>
             </div>
         </div>
     </div>
@@ -236,70 +181,8 @@
     let questao = JSON.parse($('#questao').val());
 
     // função
-    $("#but_upload").click(function(){
-        let fd = new FormData();
-        let files = '';
-        if(typeof $('#nova_opcao_imagem')[0] != 'undefined') {
-            files = $('#nova_opcao_imagem')[0].files;
-
-        }
-
-        fd.append('nova_opcao', $('#nova_opcao').val());
-        if($('#correta').is(':checked')) { 
-            fd.append('correta', true);
-        }
-
-        // Check file selected or not
-        if(files.length > 0 ) {
-            fd.append('nova_opcao_imagem', files[0]);
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: `/api/opcoes/${questao.id}`,
-            data: fd,
-            processData: false,
-            contentType: false,
-            success: function(data) {
-                $('#adicionar_opcao').modal('hide');
-                let opcao = '';
-                if(data.imagem) {
-                    opcao += `
-                        <div id="opcao_${data.id}" class="row align-middle opcao imagem-container ${data.correta && 'bg-lime'}">
-                            <div class="col-8">
-                                <img class="imagem" src="/imagens/opcoes/${data.texto}"/>
-                            </div>
-                            <div class="col-1">
-                                ${data.correta ? '<i class="fas fa-check-circle" style="color:green"></i>' : ''}
-                            </div>
-                            <div class="col-3">
-                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')" style="color:white">Excluir</a>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    opcao += `
-                        <div id="opcao_${data.id}" class="row opcao ${data.correta && 'bg-lime'}">
-                            <div class="col-8">${data.texto}</div>
-                            <div class="col-1">${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
-                            <div class="col-3">
-                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${data.id}')" style="color:white">Alterar</a>
-                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')" style="color:white">Excluir</a>
-                            </div>
-                        </div>
-                    `;
-                }
-                $('#opcoes_container').append(opcao);
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sucesso!',
-                    text: 'Alternativa adicionada.',
-                });
-            },
-        });
-        
-    });
+    function alterarOpcaoModal(opcao_id) {
+    }
 
     function excluirOpcao(opcao_id) {
         Swal.fire({
@@ -329,16 +212,86 @@
         })
     }
 
+    function adicionarOpcao() {
+        let fd = new FormData();
+        let files = '';
+        if(typeof $('#nova_opcao_imagem')[0] != 'undefined') {
+            files = $('#nova_opcao_imagem')[0].files;
+        }
+
+        fd.append('nova_opcao', $('#nova_opcao').val());
+        if($('#correta').is(':checked')) { 
+            fd.append('correta', true);
+        }
+
+        // Check file selected or not
+        if(files.length > 0 ) {
+            fd.append('nova_opcao_imagem', files[0]);
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: `/api/opcoes/${questao.id}`,
+            data: fd,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#modal_generico').modal('hide');
+                let opcao = '';
+                if(data.imagem) {
+                    opcao += `
+                        <div id="opcao_${data.id}" class="row align-middle opcao imagem-container ${data.correta && 'bg-lime'}">
+                            <div class="col-8">
+                                <img class="imagem" src="/imagens/opcoes/${data.texto}"/>
+                            </div>
+                            <div class="col-1">
+                                ${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}
+                            </div>
+                            <div class="col-3">
+                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')" style="color:white">Excluir</a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    opcao += `
+                        <div id="opcao_${data.id}" class="row opcao ${data.correta && 'bg-lime'}">
+                            <div class="col-8">${data.texto}</div>
+                            <div class="col-1">${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
+                            <div class="col-3">
+                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${data.id}')" style="color:white">Alterar</a>
+                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')" style="color:white">Excluir</a>
+                            </div>
+                        </div>
+                    `;
+                }
+                $('#opcoes_container').append(opcao);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso!',
+                    text: 'Alternativa adicionada.',
+                });
+            },
+        });
+    }
+
     function adicionarOpcaoModal() {
+        $('#modal_generico_label').html('Nova alternativa');
+
         let tipo_resposta = $('#tipo_resposta').val();
         if(tipo_resposta == 'Única Escolha') {
             let html = opcaoUnicaEscolha('texto');
-            $('#adicionar_opcao_modal_body').html(html);
+            $('#modal_generico_body').html(html);
         } else {
             let html = opcaoMultiplaEscolha('texto');
-            $('#adicionar_opcao_modal_body').html(html);
+            $('#modal_generico_body').html(html);
         }
-        $('#adicionar_opcao').modal('show');
+        $('#modal_generico_footer').html(`
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" onclick="adicionarOpcao()">Salvar</button>
+        `);
+
+        $('#modal_generico').modal('show');
     }
 
     function excluirImagem(imagem_id) {
@@ -370,8 +323,20 @@
     }
 
     function alterarLegendaModal(imagem_id) {
-        $('#alterar_legenda_imagem').modal('show');
-        $('#salvar_imagem_modal').attr('onclick', `alterarLegenda(${imagem_id})`);
+        $('#modal_generico_label').html('Alterar legenda');
+        $('#modal_generico_body').html(`
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Legenda</span>
+                </div>
+                <input type="text" class="form-control" id="nova_legenda">
+            </div>
+        `);
+        $('#modal_generico_footer').html(`
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" onclick="alterarLegenda(${imagem_id})">Salvar</button>
+        `);
+        $('#modal_generico').modal('show');
     }
 
     function alterarLegenda(imagem_id) {
@@ -421,6 +386,23 @@
         });
     }
 
+    function novoAssuntoModal() {
+        $('#modal_generico_label').html('Novo assunto');
+        $('#modal_generico_body').html(`
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Nome</span>
+                </div>
+                <input type="text" class="form-control" id="nome_novo_assunto">
+            </div>
+        `);
+        $('#modal_generico_footer').html(`
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" onclick="salvarNovoAssunto()">Salvar</button>
+        `);
+        $('#modal_generico').modal('show');
+    }
+    
     function salvarNovoAssunto() {
         $.ajax({
             type: "POST",
@@ -428,7 +410,7 @@
             data: {nome: $('#nome_novo_assunto').val()},
             success: function() {
                 carregarOpcoes('/api/assuntos', 'assunto_id');
-                $('#novo_assunto').modal('hide');
+                $('#modal_generico').modal('hide');
                 Swal.fire({
                     icon: 'success',
                     title: 'Sucesso!',
@@ -544,6 +526,15 @@
         } 
     }
 
+    // verificando se a questão foi modificada para discursiva
+    $('#tipo_resposta').on('change', function() {
+        if($('#tipo_resposta').val() == 'Discursiva') {
+            $('#opcoes_container').hide();
+        } else {
+            $('#opcoes_container').show();
+        }
+    });
+
     // exibindo as imagens selecionadas
     $('.custom-file input').change(function (e) {
         var files = [];
@@ -651,7 +642,7 @@
                                     <img class="imagem" src="/imagens/opcoes/${questao.opcoes[i].texto}"/>
                                 </div>
                                 <div class="col-1">
-                                    ${questao.opcoes[i].correta ? '<i class="fas fa-check-circle" style="color:green"></i>' : ''}
+                                    ${questao.opcoes[i].correta ? '<i class="fas fa-check-circle"></i>' : ''}
                                 </div>
                                 <div class="col-3">
                                     <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a>
@@ -662,7 +653,7 @@
                         opcao += `
                             <div id="opcao_${questao.opcoes[i].id}" class="row opcao ${questao.opcoes[i].correta && 'bg-lime'}">
                                 <div class="col-8">${questao.opcoes[i].texto}</div>
-                                <div class="col-1">${questao.opcoes[i].correta ? '<i class="fas fa-check-circle" style="color:green"></i>' : ''}</div>
+                                <div class="col-1">${questao.opcoes[i].correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
                                 <div class="col-3">
                                     <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${questao.opcoes[i].id}')" style="color:white">Alterar</a>
                                     <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a>
