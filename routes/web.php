@@ -26,3 +26,4 @@ Route::get('/home', function() {
 })->name('home')->middleware('auth');
 
 Route::resource('questoes', 'Professor\QuestoesController');
+Route::resource('cadernos_questoes', 'Professor\CadernosQuestoesController');

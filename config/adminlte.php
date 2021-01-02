@@ -266,6 +266,10 @@ return [
                 [
                     'text' => 'Todos',
                     'url'  => '#',
+                ],
+                [
+                    'text' => 'Novo',
+                    'url'  => '/cadernos_questoes/create',
                 ]
             ],
         ],
