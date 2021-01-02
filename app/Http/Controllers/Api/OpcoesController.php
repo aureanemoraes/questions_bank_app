@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Opcao;
+use App\Models\Questao;
+
 use Image;
 
 class OpcoesController extends Controller
@@ -48,8 +50,20 @@ class OpcoesController extends Controller
         return $opcao;
     }
 
-    public function update($questao_id, Request $request) {
+    public function update($id, Request $request) {
+        $opcao = Opcao::find($id);
+        if($request->nova_opcao) {
+            $opcao->texto = $request->nova_opcao;
+        }
+        if($request->correta == "true") {
+            $opcao->correta = true;
+        } else {
+            $opcao->correta = false;
+        }
+        
+        $opcao->save();
 
+        return $opcao;
     }
 
     public function destroy($id) {

@@ -24,6 +24,7 @@ Route::get('/assuntos', 'Api\AssuntosController@opcoes');
 Route::post('/assuntos', 'Api\AssuntosController@store');
 Route::post('/imagens', 'Api\ImagemController@store');
 Route::post('/opcoes/{questao_id}', 'Api\OpcoesController@store');
+Route::put('/opcoes/{id}', 'Api\OpcoesController@update');
 Route::delete('/imagens/{id}', 'Api\ImagemController@destroy');
 Route::delete('/opcoes/{id}', 'Api\OpcoesController@destroy');
 

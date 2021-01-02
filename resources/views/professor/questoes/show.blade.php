@@ -46,6 +46,12 @@
 @stop
 
 @section('content')
+<div class="container">
+    @if(($questao->tipo_resposta == 'Única Escolha') && ($opcoes_corretas > 1))
+    <div class="alert alert-danger" role="alert">
+        Esta questão possui mais de uma alternativa correta. Por favor, mude o tipo de resposta para múltipla escolha ou selecione apenas uma alternativa correta.
+    </div>
+    @endif
     <div class="card bg-primary">
         <div class="card-body">
             <div class="container-fluid">
@@ -114,6 +120,7 @@
     </div>
 
     </div>
+</div>
 
 @stop
 

@@ -182,7 +182,16 @@ class QuestoesController extends Controller
 
     public function show($id) {
         $questao = Questao::find($id);
-        return view('professor.questoes.show', compact('questao'));
+        $opcoes_corretas = 0;
+        if($questao->tipo_resposta == 'Única Escolha') {
+            foreach($questao->opcoes as $opcao) {
+                if($opcao->correta) {
+                    $opcoes_corretas++;
+                }
+            }
+        }
+
+        return view('professor.questoes.show', compact('questao', 'opcoes_corretas'));
     }
 
     public function edit($id) {
@@ -199,7 +208,7 @@ class QuestoesController extends Controller
         $componente = Componente::find($request->componente_id);
         $area_conhecimento = $this->definirAreaConhecimento($matriz->nome, $componente->nome); 
 
-        $questao->array_fill_keys([
+        $questao->fill([
             'comando' => $request->comando,
             'tipo_resposta' => $request->tipo_resposta,
             'nivel_dificuldade' => $request->nivel_dificuldade,
@@ -209,6 +218,10 @@ class QuestoesController extends Controller
             'area_conhecimento_id' => $area_conhecimento
         ]);
         $questao->save();
+
+        if($questao->tipo_resposta == 'Discursiva') {
+            $opcoes = Opcao::where('questao_id', $questao->id)->delete();
+        }
 
         // tratar imagens e armazenar
         if($request->hasFile('imagens')) {

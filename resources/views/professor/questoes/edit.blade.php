@@ -134,7 +134,13 @@
             </a>
         </div>
 
-        <div id="opcoes_container" class="container"></div>
+        <div id="opcoes_container" class="container">
+            <label>Alternativas</label>
+            <a type="button" class="btn btn-sm text-info" onclick="adicionarOpcaoModal()">
+                <i class="fas fa-plus-circle"></i>
+                Adicionar alternativa
+            </a>
+        </div>
         
         <a type="button" class="btn btn-default">Cancelar</a>
         <button type="submit" class="btn btn-primary">Salvar</button>
@@ -142,7 +148,7 @@
 
     <!-- Modal: genérico -->
     <div class="modal fade" id="modal_generico" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modal_generico_label" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modal_generico_label">Alterar legenda</h5>
@@ -195,31 +201,84 @@
     let questao = JSON.parse($('#questao').val());
 
     // função
+    function alterarOpcao(index_alternativa) {
+        let opcao_id = questao.opcoes[index_alternativa].id;
+        let alternativa_correta = '';
+
+        if($('#correta').is(':checked')) { 
+            alternativa_correta = true;
+        }
+        if($('#incorreta').is(':checked')) { 
+            alternativa_correta = false;
+        }
+
+        $.ajax({
+            type: 'PUT',
+            url: `/api/opcoes/${opcao_id}`,
+            data: {
+                nova_opcao: $('#nova_opcao').val(),
+                correta: alternativa_correta
+            },
+            success: function(data) {
+                questao.opcoes[index_alternativa] = data;
+
+                let opcao = '';
+                if(data.imagem) {
+                    opcao += `
+                        <div class="col-8">
+                            <img class="imagem" src="/imagens/opcoes/${data.texto}"/>
+                        </div>
+                        <div class="col-1">
+                            ${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}
+                        </div>
+                        <div class="col-3">
+                            <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${index_alternativa}')">Alterar</a>
+                            <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')">Excluir</a>
+                        </div>
+                    `;
+                } else {
+                    opcao += `
+                        <div class="col-8">${data.texto}</div>
+                        <div class="col-1">${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
+                        <div class="col-3">
+                            <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${index_alternativa}')">Alterar</a>
+                            <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')">Excluir</a>
+                        </div>
+                    `;
+                }
+
+                if(data.correta) {
+                    $(`#opcao_${data.id}`).addClass('bg-lime');
+                } else {
+                    $(`#opcao_${data.id}`).removeClass('bg-lime');
+                }
+
+                $(`#opcao_${data.id}`).html(opcao);
+
+
+                $('#modal_generico').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso!',
+                    text: 'Alternativa adicionada.',
+                });
+            },
+        });
+    }
     function alterarOpcaoModal(index_alternativa) {
         $('#modal_generico_label').html('Alterar alternativa');
 
-        let tipo_resposta = $('#tipo_resposta').val();
-        if(tipo_resposta == 'Única Escolha') {
-            if(questao.opcoes[index_alternativa].imagem) {
-                let html = opcaoUnicaEscolha('imagem', index_alternativa);
-                $('#modal_generico_body').html(html);
-            } else {
-                let html = opcaoUnicaEscolha('texto', index_alternativa);
-                $('#modal_generico_body').html(html);
-            }
+        if(questao.opcoes[index_alternativa].imagem) {
+            let html = opcaoInputHtml('imagem', index_alternativa);
+            $('#modal_generico_body').html(html);
         } else {
-            if(questao.opcoes[index_alternativa].imagem) {
-                let html = opcaoMultiplaEscolha('imagem', index_alternativa);
-                $('#modal_generico_body').html(html);
-            } else {
-                let html = opcaoMultiplaEscolha('texto', index_alternativa);
-                $('#modal_generico_body').html(html);
-            }
+            let html = opcaoInputHtml('texto', index_alternativa);
+            $('#modal_generico_body').html(html);
         }
 
         $('#modal_generico_footer').html(`
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-            <button type="button" class="btn btn-primary" onclick="alterarOpcao()">Salvar</button>
+            <button type="button" class="btn btn-primary" onclick="alterarOpcao('${index_alternativa}')">Salvar</button>
         `);
 
         $('#modal_generico').modal('show');
@@ -277,42 +336,51 @@
             processData: false,
             contentType: false,
             success: function(data) {
-                $('#modal_generico').modal('hide');
-                let opcao = '';
-                if(data.imagem) {
-                    opcao += `
-                        <div id="opcao_${data.id}" class="row align-middle opcao imagem-container ${data.correta && 'bg-lime'}">
-                            <div class="col-8">
-                                <img class="imagem" src="/imagens/opcoes/${data.texto}"/>
-                            </div>
-                            <div class="col-1">
-                                ${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}
-                            </div>
-                            <div class="col-3">
-                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${data}')">Alterar</a>
-                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')">Excluir</a>
-                            </div>
-                        </div>
-                    `;
+                if(data == 1) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Falha!',
+                        text: 'Esta questão já possui uma alternativa correta. Para cadastrar duas ou mais alternativas corretas, mude o tipo de resposta para múltipla escolha.',
+                    });
                 } else {
-                    opcao += `
-                        <div id="opcao_${data.id}" class="row opcao ${data.correta && 'bg-lime'}">
-                            <div class="col-8">${data.texto}</div>
-                            <div class="col-1">${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
-                            <div class="col-3">
-                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${data}')">Alterar</a>
-                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')">Excluir</a>
+                    questao.opcoes.push(data);
+                    $('#modal_generico').modal('hide');
+                    let opcao = '';
+                    if(data.imagem) {
+                        opcao += `
+                            <div id="opcao_${data.id}" class="row align-middle opcao imagem-container ${data.correta && 'bg-lime'}">
+                                <div class="col-8">
+                                    <img class="imagem" src="/imagens/opcoes/${data.texto}"/>
+                                </div>
+                                <div class="col-1">
+                                    ${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}
+                                </div>
+                                <div class="col-3">
+                                    <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${questao.opcoes.length-1}')">Alterar</a>
+                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')">Excluir</a>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                }
-                $('#opcoes_container').append(opcao);
+                        `;
+                    } else {
+                        opcao += `
+                            <div id="opcao_${data.id}" class="row opcao ${data.correta && 'bg-lime'}">
+                                <div class="col-8">${data.texto}</div>
+                                <div class="col-1">${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
+                                <div class="col-3">
+                                    <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${questao.opcoes.length-1}')">Alterar</a>
+                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')">Excluir</a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    $('#opcoes_container').append(opcao);
 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sucesso!',
-                    text: 'Alternativa adicionada.',
-                });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: 'Alternativa adicionada.',
+                    });
+                }
             },
         });
     }
@@ -320,14 +388,9 @@
     function adicionarOpcaoModal() {
         $('#modal_generico_label').html('Nova alternativa');
 
-        let tipo_resposta = $('#tipo_resposta').val();
-        if(tipo_resposta == 'Única Escolha') {
-            let html = opcaoUnicaEscolha('texto');
-            $('#modal_generico_body').html(html);
-        } else {
-            let html = opcaoMultiplaEscolha('texto');
-            $('#modal_generico_body').html(html);
-        }
+        let html = opcaoInputHtml('texto');
+        $('#modal_generico_body').html(html);
+        
         $('#modal_generico_footer').html(`
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
             <button type="button" class="btn btn-primary" onclick="adicionarOpcao()">Salvar</button>
@@ -469,29 +532,27 @@
 
     function escolherTipoOpcao(opcao, tipo_resposta) {
         if(opcao == 'texto') {
-            if(tipo_resposta == 'Única Escolha') $('#nova_opcao_div').replaceWith(opcaoUnicaEscolha(opcao));
-            if(tipo_resposta == 'Múltipla Escolha') $('#nova_opcao_div').replaceWith(opcaoMultiplaEscolha(opcao));
+            if(tipo_resposta == 'Única Escolha') $('#nova_opcao_div').replaceWith(opcaoInputHtml(opcao));
         }
         if(opcao == 'imagem') {
-            if(tipo_resposta == 'Única Escolha') $('#nova_opcao_div').replaceWith(opcaoUnicaEscolha(opcao));
-            if(tipo_resposta == 'Múltipla Escolha') $('#nova_opcao_div').replaceWith(opcaoMultiplaEscolha(opcao));
+            if(tipo_resposta == 'Única Escolha') $('#nova_opcao_div').replaceWith(opcaoInputHtml(opcao));
         }
     }
 
-    function opcaoUnicaEscolha(tipo, index_alternativa = '') {
-         if(questao.opcoes[index_alternativa].id) {
+    function opcaoInputHtml(tipo, index_alternativa = '') {
+         if(index_alternativa != '') {
             if(tipo == 'texto') {
                 let html = `
                 <div class='input-group mb-3' id='nova_opcao_div'>
                     <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'>${questao.opcoes[index_alternativa].texto}</textarea>
                     <div class='input-group-prepend'>
                         <span class='input-group-text'>
-                            <label style="margin: 4px;">Correta</label>
-                            <input type='radio' name='correta' id="correta" value="true">
+                            <label style="margin: 4px;font-size:14px;">Correta</label>
+                            <input type='radio' name='correta' id="correta" ${questao.opcoes[index_alternativa].correta && 'checked'}>
                         </span>
                         <span class='input-group-text'>
-                            <label style="margin: 4px;">Incorreta</label>
-                            <input type='radio' name='correta' id="correta" value="false">
+                            <label style="margin: 4px;font-size:14px;">Incorreta</label>
+                            <input type='radio' name='correta' id="incorreta" ${!questao.opcoes[index_alternativa].correta && 'checked'}>
                         </span>
                     </div>
                 </div>`;
@@ -503,12 +564,12 @@
                     <div class='input-group mb-3 imagem-div' id='nova_opcao_div'>
                         <div class='input-group-prepend'>
                             <span class='input-group-text'>
-                                <label style="margin: 4px;">Correta</label>
-                                <input type='radio' name='correta' id="correta">
+                                <label style="margin: 4px;font-size:14px;">Correta</label>
+                                <input type='radio' name='correta' id="correta" ${questao.opcoes[index_alternativa].correta && 'checked'}>
                             </span>
                             <span class='input-group-text'>
-                                <label style="margin: 4px;">Incorreta</label>
-                                <input type='radio' name='incorreta' id="incorreta">
+                                <label style="margin: 4px;font-size:14px;">Incorreta</label>
+                                <input type='radio' name='correta' id="incorreta" ${!questao.opcoes[index_alternativa].correta && 'checked'}>
                             </span>
                         </div>
                     </div>`;
@@ -528,7 +589,12 @@
                     <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'></textarea>
                     <div class='input-group-prepend'>
                         <span class='input-group-text'>
+                            <label style="margin: 4px;font-size:14px;">Correta</label>
                             <input type='radio' name='correta' id="correta">
+                        </span>
+                        <span class='input-group-text'>
+                            <label style="margin: 4px;font-size:14px;">Incorreta</label>
+                            <input type='radio' name='correta' id="incorreta"checked>
                         </span>
                     </div>
                 </div>`;
@@ -550,59 +616,19 @@
                             <label class="custom-file-label " for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
                         </div>
                         <div class='input-group-prepend'>
-                            <span class='input-group-text'>
-                                <input type='radio' name='correta' id="correta">
-                            </span>
-                        </div>
+                        <span class='input-group-text'>
+                            <label style="margin: 4px;font-size:14px;">Correta</label>
+                            <input type='radio' name='correta' id="correta">
+                        </span>
+                        <span class='input-group-text'>
+                            <label style="margin: 4px;font-size:14px;">Incorreta</label>
+                            <input type='radio' name='correta' id="incorreta" checked>
+                        </span>
+                    </div>
                     </div>`;
                 return html;
             }  
          }
-    }
-
-    function opcaoMultiplaEscolha(tipo) {
-        if(tipo == 'texto') {
-            let html = `
-            <div class='input-group mb-3' id='nova_opcao_div'> 
-                <div class="input-group-prepend">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Múltipla Escolha')">Texto</a>
-                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Múltipla Escolha')">Imagem</a>
-                    </div>
-                </div>
-                <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'></textarea>
-                <div class='input-group-prepend'>
-                    <span class='input-group-text'>
-                        <input type='checkbox' name='correta' id="correta">
-                    </span>
-                </div>
-            </div>`;
-
-            return html;
-        }
-        if(tipo == 'imagem') {
-            let html = `
-                <div class='input-group mb-3 imagem-div' id='nova_opcao_div'> 
-                    <div class="input-group-prepend">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Múltipla Escolha')">Texto</a>
-                            <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Múltipla Escolha')">Imagem</a>
-                        </div>
-                    </div>
-                    <div class="custom-file" >
-                        <input type="file" class="custom-file-input" name="nova_opcao_imagem" id="nova_opcao_imagem">
-                        <label class="custom-file-label" for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
-                    </div>
-                    <div class='input-group-prepend'>
-                        <span class='input-group-text'>
-                            <input type='checkbox' name='correta' id="correta"}>
-                        </span>
-                    </div>
-                </div>`;
-            return html;
-        } 
     }
 
     // verificando se a questão foi modificada para discursiva
@@ -708,13 +734,7 @@
 
         // opções
         if(questao.opcoes.length > 0) {
-            let opcao = `
-                <label>Alternativas</label>
-                <a type="button" class="btn btn-sm text-info" onclick="adicionarOpcaoModal()">
-                    <i class="fas fa-plus-circle"></i>
-                    Adicionar alternativa
-                </a>
-            `;
+            let opcao = '';
             for(let i=0 ; i<questao.opcoes.length ; i++) {
                 if(questao.opcoes[i]) {
                     if(questao.opcoes[i].imagem) {
@@ -747,7 +767,10 @@
                 }
             }
 
-            $('#opcoes_container').html(opcao);
+            $('#opcoes_container').append(opcao);
+
+        } else {
+            $('#opcoes_container').hide();
 
         }
     });
