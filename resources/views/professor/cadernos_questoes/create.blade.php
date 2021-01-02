@@ -253,7 +253,7 @@
                     },
                     {
                         id: 'Simulado',
-                        text: 'Público'
+                        text: 'Simulado'
                     },
                     {
                         id: 'Prova',
@@ -278,15 +278,15 @@
                         text: "ENEM",
                         children: [
                             {
-                                id: 'LINGUAGENS, CÓDIGO E SUAS TECNOLOGIAS',
+                                id: 'ENEM - LINGUAGENS, CÓDIGO E SUAS TECNOLOGIAS',
                                 text: 'LINGUAGENS, CÓDIGO E SUAS TECNOLOGIAS'
                             },
                             {
-                                id: 'CIÊNCIAS NATURAIS E SUAS TECNOLOGIAS',
+                                id: 'ENEM - CIÊNCIAS NATURAIS E SUAS TECNOLOGIAS',
                                 text: 'CIÊNCIAS NATURAIS E SUAS TECNOLOGIAS'
                             },
                             {
-                                id: 'CIÊNCIAS HUMANAS E SUAS TECNOLOGIAS',
+                                id: 'ENEM - CIÊNCIAS HUMANAS E SUAS TECNOLOGIAS',
                                 text: 'CIÊNCIAS HUMANAS E SUAS TECNOLOGIAS' 
                             }
                         ],
@@ -296,11 +296,11 @@
                         text: "EJA",
                         children: [
                             {
-                                id: '1ª Etapa',
+                                id: 'EJA - 1ª Etapa',
                                 text: '1ª Etapa'
                             },
                             {
-                                id: '2ª Etapa',
+                                id: 'EJA - 2ª Etapa',
                                 text: '2ª Etapa'
                             }
                         ],

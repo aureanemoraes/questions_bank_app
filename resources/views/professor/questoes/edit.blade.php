@@ -142,8 +142,16 @@
             </a>
         </div>
         
-        <a type="button" class="btn btn-default">Cancelar</a>
-        <button type="submit" class="btn btn-primary">Salvar</button>
+        <div class="form-group mb-3">
+            <div class="row">
+                <div class="col">
+                    <a href="{{ URL::previous() }}" class="btn btn-secondary"> <i class="fas fa-arrow-left"></i> Voltar</a>
+                </div>
+                <div class="col" align="right">
+                    <button type="submit" class="btn btn-primary"> Salvar  <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
     </form>
 
     <!-- Modal: genérico -->

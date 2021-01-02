@@ -11,10 +11,16 @@ class Questao extends Model
     protected $fillable = ['comando', 'tipo_resposta', 'nivel_dificuldade', 'matriz_id', 'componente_id', 'assunto_id', 'imagens', 'user_id', 'area_conhecimento_id', 'opcoes'];
 
     // relacionamentos
+    public function cadernos_questoes()
+    {
+        return $this->belongsToMany('App\Models\CadernoQuestao', 'questoes_caderno_questoes');
+    }
+
     public function autor()
     {
         return $this->belongsTo('App\User');
     }
+    
 
     public function opcoes()
     {

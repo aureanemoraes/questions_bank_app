@@ -16,7 +16,7 @@ class CreateCadernoDeQuestaoTable extends Migration
         Schema::create('cadernos_questoes', function (Blueprint $table) {
             $table->id();
             $table->text('titulo');
-            $table->longText('informacoes_adicionais');
+            $table->longText('informacoes_adicionais')->nullable();
             $table->date('data_inicial');
             $table->date('data_final');
             $table->time('duracao');
