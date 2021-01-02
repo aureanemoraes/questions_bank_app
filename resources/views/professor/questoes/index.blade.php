@@ -51,7 +51,7 @@
             </thead>
             <tbody>
                 @foreach($questoes as $questao)
-                <tr>
+                <tr id={{"questao_$questao->id"}}>
                     <td>{{$questao->id}}</td>
                     <td>{{$questao->comando}}</td>
                     <td>{{$questao->tipo_resposta}}</td>
@@ -62,7 +62,7 @@
                     <td>{{$questao->area_conhecimento->nome}}</td>
                     <td>
                         <a type="button" class="btn btn-sm btn-info" href="{{route('questoes.show', $questao)}}">Ver</a>
-                        <a type="button" class="btn btn-sm btn-danger" href="{{route('questoes.destroy', $questao)}}">Excluir</a>
+                        <a type="button" class="btn btn-sm btn-danger" onclick="excluirQuestao({{$questao->id}})">Excluir</a>
                     </td>
                 </tr>
                 @endforeach
@@ -87,7 +87,42 @@
 @section('js')
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
+        // funções
+        function excluirQuestao(questao_id) {
+            Swal.fire({
+                title: 'Confirmação',
+                text: "Você tem certeza que deseja excluir essa questão?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim, tenho certeza!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: "DELETE",
+                        url: `/questoes/${questao_id}`,
+                        success: function() {
+                            $(`#questao_${questao_id}`).remove();
+
+                            Swal.fire(
+                                'Sucessso!',
+                                'Questão excluída com sucesso.',
+                                'success'
+                            );
+                        },
+                    });
+                }
+            })
+        }
+
+
         $(document).ready(function(d) {
             var theadname = ['Comando', 'Assunto'];
 

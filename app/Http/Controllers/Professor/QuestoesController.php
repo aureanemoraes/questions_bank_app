@@ -220,7 +220,18 @@ class QuestoesController extends Controller
         $questao->save();
 
         if($questao->tipo_resposta == 'Discursiva') {
-            $opcoes = Opcao::where('questao_id', $questao->id)->delete();
+            // excluir questoes da base de dados e excluir imagens do banco
+            $opcoes = Opcao::where('questao_id', $questao->id)->get();
+            foreach($opcoes as $opcao) {
+                if($opcao->imagem) {
+                    if(file_exists(public_path("imagens/opcoes/$opcao->texto"))){
+                        unlink(public_path("imagens/opcoes/$opcao->texto"));
+                    }
+                    $opcao->delete();
+                } else {
+                    $opcao->delete();
+                }
+            }
         }
 
         // tratar imagens e armazenar
@@ -261,8 +272,32 @@ class QuestoesController extends Controller
 
     }
 
-    public function destroy() {
-        
+    public function destroy($id) {
+        // excluir a questão e as imagens da questão
+        $questao = Questao::find($id);
+        $imagens = Imagem::where('questao_id', $questao->id)->get();
+        foreach($imagens as $imagem) {
+            if(file_exists(public_path("imagens/questoes/$imagem->caminho"))){
+                unlink(public_path("imagens/questoes/$imagem->caminho"));
+            }
+            $imagem->delete();
+        }
+
+        // excluir as opções e as imagens das opções
+        $opcoes = Opcao::where('questao_id', $questao->id)->get();
+        foreach($opcoes as $opcao) {
+            if($opcao->imagem) {
+                if(file_exists(public_path("imagens/opcoes/$opcao->texto"))){
+                    unlink(public_path("imagens/opcoes/$opcao->texto"));
+                }
+                $opcao->delete();
+            } else {
+                $opcao->delete();
+            }
+        }
+
+        $questao->delete();
+        return 1;
     }
 
     private function definirAreaConhecimento($matriz, $componente) {
