@@ -48,6 +48,10 @@ class OpcoesController extends Controller
         return $opcao;
     }
 
+    public function update($questao_id, Request $request) {
+
+    }
+
     public function destroy($id) {
         $opcao = Opcao::find($id);
         if($opcao) {

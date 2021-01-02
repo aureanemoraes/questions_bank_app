@@ -25,15 +25,28 @@
             max-width: 100px;
         }
 
+        a.btn-warning {
+            color: black ;
+        }
+
+        a.btn-danger {
+            color: white;
+        }
+
         .opcao {
             display: flex;
             align-items: center;
             background: #0275d8;
-            color: white;
             margin: 4px;
             border-radius: 4px;
             padding: 4px;
         }
+
+        .col-8 {
+            color: white;
+        }
+
+        
     </style>
 @stop
 
@@ -116,6 +129,7 @@
             </select>
             <!-- Novo assunto -->
             <a type="button" class="btn btn-sm text-info" onclick="novoAssuntoModal()">
+                <i class="fas fa-plus-circle"></i>
                 Novo assunto
             </a>
         </div>
@@ -181,7 +195,34 @@
     let questao = JSON.parse($('#questao').val());
 
     // função
-    function alterarOpcaoModal(opcao_id) {
+    function alterarOpcaoModal(index_alternativa) {
+        $('#modal_generico_label').html('Alterar alternativa');
+
+        let tipo_resposta = $('#tipo_resposta').val();
+        if(tipo_resposta == 'Única Escolha') {
+            if(questao.opcoes[index_alternativa].imagem) {
+                let html = opcaoUnicaEscolha('imagem', index_alternativa);
+                $('#modal_generico_body').html(html);
+            } else {
+                let html = opcaoUnicaEscolha('texto', index_alternativa);
+                $('#modal_generico_body').html(html);
+            }
+        } else {
+            if(questao.opcoes[index_alternativa].imagem) {
+                let html = opcaoMultiplaEscolha('imagem', index_alternativa);
+                $('#modal_generico_body').html(html);
+            } else {
+                let html = opcaoMultiplaEscolha('texto', index_alternativa);
+                $('#modal_generico_body').html(html);
+            }
+        }
+
+        $('#modal_generico_footer').html(`
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" onclick="alterarOpcao()">Salvar</button>
+        `);
+
+        $('#modal_generico').modal('show');
     }
 
     function excluirOpcao(opcao_id) {
@@ -248,7 +289,8 @@
                                 ${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}
                             </div>
                             <div class="col-3">
-                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')" style="color:white">Excluir</a>
+                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${data}')">Alterar</a>
+                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')">Excluir</a>
                             </div>
                         </div>
                     `;
@@ -258,8 +300,8 @@
                             <div class="col-8">${data.texto}</div>
                             <div class="col-1">${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
                             <div class="col-3">
-                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${data.id}')" style="color:white">Alterar</a>
-                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')" style="color:white">Excluir</a>
+                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${data}')">Alterar</a>
+                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${data.id}')">Excluir</a>
                             </div>
                         </div>
                     `;
@@ -436,30 +478,46 @@
         }
     }
 
-    function opcaoUnicaEscolha(tipo) {
-        if(tipo == 'texto') {
-            let html = `
-            <div class='input-group mb-3' id='nova_opcao_div'> 
-                <div class="input-group-prepend">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
-                        <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
+    function opcaoUnicaEscolha(tipo, index_alternativa = '') {
+         if(questao.opcoes[index_alternativa].id) {
+            if(tipo == 'texto') {
+                let html = `
+                <div class='input-group mb-3' id='nova_opcao_div'>
+                    <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'>${questao.opcoes[index_alternativa].texto}</textarea>
+                    <div class='input-group-prepend'>
+                        <span class='input-group-text'>
+                            <label style="margin: 4px;">Correta</label>
+                            <input type='radio' name='correta' id="correta" value="true">
+                        </span>
+                        <span class='input-group-text'>
+                            <label style="margin: 4px;">Incorreta</label>
+                            <input type='radio' name='correta' id="correta" value="false">
+                        </span>
                     </div>
-                </div>
-                <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'></textarea>
-                <div class='input-group-prepend'>
-                    <span class='input-group-text'>
-                        <input type='radio' name='correta' id="correta">
-                    </span>
-                </div>
-            </div>`;
+                </div>`;
 
-            return html;
-        }
-        if(tipo == 'imagem') {
-            let html = `
-                <div class='input-group mb-3 imagem-div' id='nova_opcao_div'> 
+                return html;
+            }
+            if(tipo == 'imagem') {
+                let html = `
+                    <div class='input-group mb-3 imagem-div' id='nova_opcao_div'>
+                        <div class='input-group-prepend'>
+                            <span class='input-group-text'>
+                                <label style="margin: 4px;">Correta</label>
+                                <input type='radio' name='correta' id="correta">
+                            </span>
+                            <span class='input-group-text'>
+                                <label style="margin: 4px;">Incorreta</label>
+                                <input type='radio' name='incorreta' id="incorreta">
+                            </span>
+                        </div>
+                    </div>`;
+                return html;
+            }  
+         } else {
+            if(tipo == 'texto') {
+                let html = `
+                <div class='input-group mb-3' id='nova_opcao_div'> 
                     <div class="input-group-prepend">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
                         <div class="dropdown-menu">
@@ -467,18 +525,39 @@
                             <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
                         </div>
                     </div>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" name="nova_opcao_imagem" id="nova_opcao_imagem" >
-                        <label class="custom-file-label " for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
-                    </div>
+                    <textarea class='form-control' name='nova_opcao' id="nova_opcao" placeholder='Nova alternativa...'></textarea>
                     <div class='input-group-prepend'>
                         <span class='input-group-text'>
                             <input type='radio' name='correta' id="correta">
                         </span>
                     </div>
                 </div>`;
-            return html;
-        }   
+
+                return html;
+            }
+            if(tipo == 'imagem') {
+                let html = `
+                    <div class='input-group mb-3 imagem-div' id='nova_opcao_div'> 
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tipo</button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" type="button" id="opcao_texto" onclick="escolherTipoOpcao('texto', 'Única Escolha')">Texto</a>
+                                <a class="dropdown-item" type="button" id="opcao_imagem" onclick="escolherTipoOpcao('imagem', 'Única Escolha')">Imagem</a>
+                            </div>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="nova_opcao_imagem" id="nova_opcao_imagem" >
+                            <label class="custom-file-label " for="imagem_nova_opcao" data-browse="Procurar">Procurar imagem...</label>
+                        </div>
+                        <div class='input-group-prepend'>
+                            <span class='input-group-text'>
+                                <input type='radio' name='correta' id="correta">
+                            </span>
+                        </div>
+                    </div>`;
+                return html;
+            }  
+         }
     }
 
     function opcaoMultiplaEscolha(tipo) {
@@ -631,7 +710,10 @@
         if(questao.opcoes.length > 0) {
             let opcao = `
                 <label>Alternativas</label>
-                <a type="button" class="btn btn-sm btn-link" onclick="adicionarOpcaoModal()">Nova opção</a>
+                <a type="button" class="btn btn-sm text-info" onclick="adicionarOpcaoModal()">
+                    <i class="fas fa-plus-circle"></i>
+                    Adicionar alternativa
+                </a>
             `;
             for(let i=0 ; i<questao.opcoes.length ; i++) {
                 if(questao.opcoes[i]) {
@@ -645,7 +727,8 @@
                                     ${questao.opcoes[i].correta ? '<i class="fas fa-check-circle"></i>' : ''}
                                 </div>
                                 <div class="col-3">
-                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a>
+                                    <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${questao.opcoes.indexOf(questao.opcoes[i])}')">Alterar</a>
+                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')">Excluir</a>
                                 </div>
                             </div>
                         `;
@@ -655,8 +738,8 @@
                                 <div class="col-8">${questao.opcoes[i].texto}</div>
                                 <div class="col-1">${questao.opcoes[i].correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
                                 <div class="col-3">
-                                    <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${questao.opcoes[i].id}')" style="color:white">Alterar</a>
-                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')" style="color:white">Excluir</a>
+                                    <a type="button" class="btn btn-sm btn-warning" onclick="alterarOpcaoModal('${questao.opcoes.indexOf(questao.opcoes[i])}')">Alterar</a>
+                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirOpcao('${questao.opcoes[i].id}')">Excluir</a>
                                 </div>
                             </div>
                         `;
