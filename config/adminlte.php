@@ -269,7 +269,7 @@ return [
                 ],
                 [
                     'text' => 'Novo',
-                    'url'  => '/cadernos_questoes/create',
+                    'url'  => '/cadernos_questoes/pre-create',
                 ]
             ],
         ],
