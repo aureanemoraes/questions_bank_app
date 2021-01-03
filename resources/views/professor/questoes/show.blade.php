@@ -65,6 +65,7 @@
 
 @section('content')
 <div class="container">
+    <input type="hidden" id="questao_id" value="{{$questao->id}}">
     @if(($questao->tipo_resposta == 'Única Escolha') && ($opcoes_corretas > 1))
     <div class="alert alert-danger" role="alert">
         Esta questão possui mais de uma alternativa correta. Por favor, mude o tipo de resposta para múltipla escolha ou selecione apenas uma alternativa correta.
@@ -230,6 +231,48 @@
 
     <script>
         // funcão
+        function adicionarEmUmCq() {
+            // Esta questão já está adicionada ao cq 0
+            // O caderno de questões já atingiu o limite de questões. -1
+            let cq_id = $('#caderno_questao_select').val();
+            let questao_id = $('#questao_id').val();
+
+            $.ajax({
+                type: 'POST',
+                url: `/api/cadernos_questoes`,
+                data: {
+                    cq_id: cq_id,
+                    questao_id: questao_id
+                },
+                success: function(data) {
+                    if(data == 1) {
+                        // redirecionar para show caderno questao
+                        Swal.fire(
+                            'Sucessso!',
+                            'Questão adicionada ao caderno de questões com sucesso.',
+                            'success'
+                        );
+
+                        setTimeout(function() {
+                            window.location.href=`/cadernos_questoes/${cq_id}`
+                        }, 1000);
+                    } else if(data == 0) {
+                        Swal.fire(
+                            'Falha!',
+                            'Esta questão já está adicionada ao caderno de questões.',
+                            'error'
+                        );
+                    } else {
+                        Swal.fire(
+                            'Falha!',
+                            'O quantidade limite de questões para este caderno já foi atingida.',
+                            'error'
+                        );
+                    }
+                },
+            });
+        }
+
         function adicionarEmUmCqModal() {
             $('#modal_generico_label').html('Adicionar a um caderno de questões');
             $('#modal_generico_body').html(`

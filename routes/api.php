@@ -27,6 +27,7 @@ Route::get('/cadernos_questoes/{user_id}', 'Api\CadernosQuestoesController@lista
 Route::post('/assuntos', 'Api\AssuntosController@store');
 Route::post('/imagens', 'Api\ImagemController@store');
 Route::post('/opcoes/{questao_id}', 'Api\OpcoesController@store');
+Route::post('/cadernos_questoes', 'Api\CadernosQuestoesController@adicionarQuestao');
 Route::put('/opcoes/{id}', 'Api\OpcoesController@update');
 Route::delete('/imagens/{id}', 'Api\ImagemController@destroy');
 Route::delete('/opcoes/{id}', 'Api\OpcoesController@destroy');

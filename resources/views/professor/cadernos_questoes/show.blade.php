@@ -93,17 +93,22 @@
                     <div class="inner">
                         <h5>Questões</h5>
                         @if(count($caderno_questao->questoes) > 0)
-                            <div class="card bg-gradient-info">
-                                <div class="card-header">
-                                    <h5 class="card-title">Default Card Example</h5>
+                            @foreach($caderno_questao->questoes as $questao)
+                                <div class="card bg-gradient-info">
+                                    <div class="card-header">
+                                        <h5 class="card-title">{!! nl2br(e($questao->comando)) !!}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        @foreach($questao->opcoes as $opcao)
+                                            <p>{!! nl2br(e($opcao->texto)) !!}</p>
+                                        @endforeach
+                                    </div>
+                                    <div class="card-footer">
+                                        <button>Ver</button>
+                                        <button>Remover</button>
+                                    </div>
                                 </div>
-                                <div class="card-body">
-                                    The body of the card
-                                </div>
-                                <div class="card-footer">
-                                    The footer of the card
-                                </div>
-                            </div>
+                            @endforeach
                         @else
                             <p>Ainda não possui questões.</p>
                         @endif

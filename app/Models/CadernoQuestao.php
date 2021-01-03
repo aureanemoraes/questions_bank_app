@@ -26,6 +26,6 @@ class CadernoQuestao extends Model
     // relacionamentos
     public function questoes()
     {
-        return $this->belongsToMany('App\Models\Questao', 'questoes_caderno_questoes');
+        return $this->belongsToMany('App\Models\Questao', 'questoes_caderno_questoes')->withPivot('valor');
     }
 }

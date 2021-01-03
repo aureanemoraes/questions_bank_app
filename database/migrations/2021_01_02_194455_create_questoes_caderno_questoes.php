@@ -21,6 +21,7 @@ class CreateQuestoesCadernoQuestoes extends Migration
             # caderno questão
             $table->unsignedBigInteger('caderno_questao_id');
             $table->foreign('caderno_questao_id')->references('id')->on('cadernos_questoes');
+            $table->integer('valor');
             $table->timestamps();
         });
     }

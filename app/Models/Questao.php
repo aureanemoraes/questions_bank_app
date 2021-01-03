@@ -13,7 +13,7 @@ class Questao extends Model
     // relacionamentos
     public function cadernos_questoes()
     {
-        return $this->belongsToMany('App\Models\CadernoQuestao', 'questoes_caderno_questoes');
+        return $this->belongsToMany('App\Models\CadernoQuestao', 'questoes_caderno_questoes')->withPivot('valor');
     }
 
     public function autor()
