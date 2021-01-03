@@ -28,6 +28,9 @@ Route::get('/home', function() {
 Route::get('cadernos_questoes/pre-create', function() {
     return view('professor.cadernos_questoes.pre-create');
 });
-
+Route::get('questoes/minhas', 'Professor\QuestoesController@my_index');
 Route::resource('questoes', 'Professor\QuestoesController');
+Route::get('cadernos_questoes/meus', 'Professor\CadernosQuestoesController@my_index');
+
 Route::resource('cadernos_questoes', 'Professor\CadernosQuestoesController');
+

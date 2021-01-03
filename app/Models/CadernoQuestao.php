@@ -28,4 +28,8 @@ class CadernoQuestao extends Model
     {
         return $this->belongsToMany('App\Models\Questao', 'questoes_caderno_questoes')->withPivot('valor');
     }
+
+    public function autor() {
+        return $this->belongsTo('App\User');
+    }
 }

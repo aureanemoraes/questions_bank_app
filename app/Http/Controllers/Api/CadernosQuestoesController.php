@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Auth;
 
 class CadernosQuestoesController extends Controller
 {
+    public function excluirQuestao($questao_id, $cq_id) {
+        $cq = CadernoQuestao::find($cq_id);
+        $cq->questoes()->detach($questao_id);
+
+        return 1;
+    }
+
     public function adicionarQuestao(Request $request) {
         $cq_id = $request->input('cq_id');
         $questao_id = $request->input('questao_id');

@@ -243,7 +243,7 @@ return [
             'submenu' => [
                 [
                     'text' => 'Minhas',
-                    'url'  => '/professor/questoes',
+                    'url'  => '/questoes/minhas',
                 ],
                 [
                     'text' => 'Todas',
@@ -261,11 +261,11 @@ return [
             'submenu' => [
                 [
                     'text' => 'Meus',
-                    'url'  => '#',
+                    'url'  => '/cadernos_questoes/meus',
                 ],
                 [
                     'text' => 'Todos',
-                    'url'  => '#',
+                    'url'  => '/cadernos_questoes',
                 ],
                 [
                     'text' => 'Novo',

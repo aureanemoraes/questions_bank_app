@@ -10,10 +10,21 @@ use Carbon\Carbon;
 
 class CadernosQuestoesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    public function my_index() {
+        $id = Auth::id();
+        $cadernos_questoes = CadernoQuestao::where('user_id', $id)->get();
+        return view('professor.cadernos_questoes.index', compact('cadernos_questoes'));
+    }
 
     public function index()
     {
-        //
+        $cadernos_questoes = CadernoQuestao::all();
+        return view('professor.cadernos_questoes.index', compact('cadernos_questoes'));
     }
 
     public function create()
@@ -64,6 +75,9 @@ class CadernosQuestoesController extends Controller
     
     public function destroy($id)
     {
-        //
+        $cq = CadernoQuestao::find($id);
+        $cq->questoes()->detach();
+        $cq->delete();
+        return 1;
     }
 }

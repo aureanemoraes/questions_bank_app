@@ -19,6 +19,12 @@ class QuestoesController extends Controller
         $this->middleware('auth');
     }
 
+    public function my_index() {
+        $id = Auth::id();
+        $questoes = Questao::where('user_id', $id)->get();
+        return view('professor.questoes.index', compact('questoes'));
+    }
+
     public function index() {
         $questoes = Questao::all();
         return view('professor.questoes.index', compact('questoes'));

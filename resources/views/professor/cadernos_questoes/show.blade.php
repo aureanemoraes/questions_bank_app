@@ -11,6 +11,11 @@
 
 @section('content')
     <div class="container">
+        @if(count($caderno_questao->questoes) < $caderno_questao->quantidade_questoes)
+        <div class="alert alert-danger" role="alert">
+            Este caderno não possui a quantidade de questões declaradas. Adicione questões ou altere o valor da quantidade de questões!
+        </div>
+        @endif
         <div class="card card-primary">
             <div class="card-header">
                 <h3 class="card-title">{!! nl2br(e($caderno_questao->titulo)) !!}</h3>
@@ -92,22 +97,27 @@
                 <div class="small-box bg-gradient-primary">
                     <div class="inner">
                         <h5>Questões</h5>
+                        @php {{$contador = 1;}} @endphp
                         @if(count($caderno_questao->questoes) > 0)
                             @foreach($caderno_questao->questoes as $questao)
-                                <div class="card bg-gradient-info">
+                                <div class="card bg-gradient-info collapsed-card" id="questao_{{$questao->id}}">
                                     <div class="card-header">
-                                        <h5 class="card-title">{!! nl2br(e($questao->comando)) !!}</h5>
+                                        <h5 class="card-title">{{$contador}}) {!! nl2br(e($questao->comando)) !!}</h5>
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                        </div>
                                     </div>
                                     <div class="card-body">
                                         @foreach($questao->opcoes as $opcao)
                                             <p>{!! nl2br(e($opcao->texto)) !!}</p>
                                         @endforeach
                                     </div>
-                                    <div class="card-footer">
-                                        <button>Ver</button>
-                                        <button>Remover</button>
+                                    <div class="card-footer" align="right">
+                                        <a class="btn btn-sm btn-primary" href="{{route('questoes.show', $questao->id)}}">Ver</a>
+                                        <button class="btn btn-sm btn-danger" onclick="removerOpcao({{$questao->id}}, {{$caderno_questao->id}})">Remover</button>
                                     </div>
                                 </div>
+                                @php {{$contador++;}} @endphp
                             @endforeach
                         @else
                             <p>Ainda não possui questões.</p>
@@ -131,4 +141,37 @@
 
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        //funções
+        function removerOpcao(questao_id, cq_id) {
+            Swal.fire({
+                title: 'Confirmação',
+                text: "Você tem certeza que deseja remover esta questão? A questão não será excluída, apenas removida deste caderno.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim, tenho certeza!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "DELETE",
+                        url: `/api/cadernos_questoes/${questao_id}/${cq_id}`,
+                        success: function(data) {
+                            if(data == 1) {
+                                $(`#questao_${questao_id}`).remove();
+
+                                Swal.fire(
+                                    'Sucessso!',
+                                    'Imagem excluída com sucesso.',
+                                    'success'
+                                );
+                            }
+                        },
+                    });
+                }
+            })
+        }
+    </script>
 @stop

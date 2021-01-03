@@ -31,6 +31,7 @@ Route::post('/cadernos_questoes', 'Api\CadernosQuestoesController@adicionarQuest
 Route::put('/opcoes/{id}', 'Api\OpcoesController@update');
 Route::delete('/imagens/{id}', 'Api\ImagemController@destroy');
 Route::delete('/opcoes/{id}', 'Api\OpcoesController@destroy');
+Route::delete('/cadernos_questoes/{questao_id}/{cq_id}', 'Api\CadernosQuestoesController@excluirQuestao');
 
 
 
