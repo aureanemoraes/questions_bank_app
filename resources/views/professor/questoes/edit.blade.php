@@ -36,7 +36,6 @@
         .opcao {
             display: flex;
             align-items: center;
-            background: #0275d8;
             margin: 4px;
             border-radius: 4px;
             padding: 4px;
@@ -55,104 +54,112 @@
 @stop
 
 @section('content')
-    <form action="{{route('questoes.update', $questao)}}" method="POST" enctype="multipart/form-data" id="editar_questao">
-        @csrf
-        @method('put')
-        <div class="form-group mb-3">
-            <div class="input-group-prepend">
-                <label for="Comando">Comando*</label>
+    <div class="container">
+        <form action="{{route('questoes.update', $questao)}}" method="POST" enctype="multipart/form-data" id="editar_questao">
+            @csrf
+            @method('put')
+            <input type="hidden" id="questao" value="{{$questao}}">
+            <div class="form-group mb-3">
+                <div class="input-group-prepend">
+                    <label for="Comando">Comando*</label>
+                </div>
+                <textarea name="comando" class="form-control" aria-label="Comando" rows="4">{{$questao->comando}}</textarea>
             </div>
-            <textarea name="comando" class="form-control" aria-label="Comando" rows="6">{{$questao->comando}}</textarea>
-        </div>
-        @if(count($questao->imagens) > 0)
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered">
-                    <thead class="bg-primary">
-                        <tr>
-                            <th scope="col">Imagem</th>
-                            <th scope="col">Legenda</th>
-                            <th scope="col">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($questao->imagens as $imagem)
-                        <tr id="linha_{{$imagem->id}}">
-                            <td><img src="{{asset("imagens/questoes/$imagem->caminho")}}" alt="{{$imagem->legenda}}"></td>
-                            <td id="legenda_{{$imagem->id}}">{{$imagem->legenda}}</td>
-                            <td>
-                                <a type="button" class="btn btn-sm btn-warning" onclick="alterarLegendaModal({{$imagem->id}})">Alterar legenda</a>
-                                <a type="button" class="btn btn-sm btn-danger" onclick="excluirImagem({{$imagem->id}})">Excluir</a>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+            @if(count($questao->imagens) > 0)
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="bg-primary">
+                            <tr>
+                                <th scope="col">Imagem</th>
+                                <th scope="col">Legenda</th>
+                                <th scope="col">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($questao->imagens as $imagem)
+                            <tr id="linha_{{$imagem->id}}">
+                                <td><img src="{{asset("imagens/questoes/$imagem->caminho")}}" alt="{{$imagem->legenda}}"></td>
+                                <td id="legenda_{{$imagem->id}}">{{$imagem->legenda}}</td>
+                                <td>
+                                    <a type="button" class="btn btn-sm btn-warning" onclick="alterarLegendaModal({{$imagem->id}})">Alterar legenda</a>
+                                    <a type="button" class="btn btn-sm btn-danger" onclick="excluirImagem({{$imagem->id}})">Excluir</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+            <div class="custom-file mb-3">
+                <input name="imagens[]" type="file" class="custom-file-input" id="imagens" multiple>
+                <label class="custom-file-label" for="imagens" data-browse="Procurar">Selecione as imagens...</label>
             </div>
-        @endif
-        <div class="custom-file mb-3">
-            <input name="imagens[]" type="file" class="custom-file-input" id="imagens" multiple>
-            <label class="custom-file-label" for="imagens" data-browse="Procurar">Selecione as imagens...</label>
-        </div>
-        
-        <div class="alert alert-info" role="alert">
-            Por padrão as imagens serão legendadas como: "Figura 1", "Figura 2" e assim sucessivamente. É possível editar a legenda na opção "Editar Questão".
-        </div>
 
-        <div class="form-group">
-            <label for="tipo_resposta">Tipo de resposta*</label>
-            <select class="form-control" id="tipo_resposta" name="tipo_resposta">
-            </select>
-        </div>
-        <input type="hidden" id="questao" value="{{$questao}}">
-
-        <div class="form-group">
-            <label for="nivel_dificuldade">Nível de dificuldade*</label>
-            <select class="form-control" id="nivel_dificuldade" name="nivel_dificuldade">
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="matriz_id">Matriz*</label>
-            <select class="form-control" id="matriz_id" name="matriz_id">
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="componente_id">Componente*</label>
-            <select class="form-control" id="componente_id" name="componente_id">
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="assunto_id">Assunto*</label>
-            <select class="form-control" id="assunto_id" name="assunto_id">
-            </select>
-            <!-- Novo assunto -->
-            <a type="button" class="btn btn-sm text-info" onclick="novoAssuntoModal()">
-                <i class="fas fa-plus-circle"></i>
-                Novo assunto
-            </a>
-        </div>
-
-        <div id="opcoes_container" class="container">
-            <label>Alternativas</label>
-            <a type="button" class="btn btn-sm text-info" onclick="adicionarOpcaoModal()">
-                <i class="fas fa-plus-circle"></i>
-                Adicionar alternativa
-            </a>
-        </div>
-        
-        <div class="form-group mb-3">
             <div class="row">
                 <div class="col">
-                    <a href="{{ URL::previous() }}" class="btn btn-secondary"> <i class="fas fa-arrow-left"></i> Voltar</a>
+                    <div class="form-group mb-3">
+                        <label for="tipo_resposta">Tipo de resposta*</label>
+                        <select class="form-control" id="tipo_resposta" name="tipo_resposta">
+                        </select>
+                    </div>
                 </div>
-                <div class="col" align="right">
-                    <button type="submit" class="btn btn-primary"> Salvar  <i class="fas fa-arrow-right"></i></button>
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label for="nivel_dificuldade">Nível de dificuldade*</label>
+                        <select class="form-control" id="nivel_dificuldade" name="nivel_dificuldade">
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label for="matriz_id">Matriz*</label>
+                        <select class="form-control" id="matriz_id" name="matriz_id">
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label for="componente_id">Componente*</label>
+                        <select class="form-control" id="componente_id" name="componente_id">
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="assunto_id">Assunto*</label>
+                <select class="form-control" id="assunto_id" name="assunto_id">
+                </select>
+                <!-- Novo assunto -->
+                <a type="button" class="btn btn-sm text-info" onclick="novoAssuntoModal()">
+                    <i class="fas fa-plus-circle"></i>
+                    Novo assunto
+                </a>
+            </div>
+
+            <div id="opcoes_container" class="container">
+                <label>Alternativas</label>
+                <a type="button" class="btn btn-sm text-info" onclick="adicionarOpcaoModal()">
+                    <i class="fas fa-plus-circle"></i>
+                    Adicionar alternativa
+                </a>
+            </div>
+            
+            <div class="form-group mb-3">
+                <div class="row">
+                    <div class="col">
+                        <a href="{{ URL::previous() }}" class="btn btn-secondary"> <i class="fas fa-arrow-left"></i> Voltar</a>
+                    </div>
+                    <div class="col" align="right">
+                        <button type="submit" class="btn btn-primary"> Salvar  <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <!-- Modal: genérico -->
     <div class="modal fade" id="modal_generico" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modal_generico_label" aria-hidden="true">
@@ -256,9 +263,9 @@
                 }
 
                 if(data.correta) {
-                    $(`#opcao_${data.id}`).addClass('bg-lime');
+                    $(`#opcao_${data.id}`).addClass('bg-gradient-success');
                 } else {
-                    $(`#opcao_${data.id}`).removeClass('bg-lime');
+                    $(`#opcao_${data.id}`).removeClass('bg-gradient-success');
                 }
 
                 $(`#opcao_${data.id}`).html(opcao);
@@ -356,7 +363,7 @@
                     let opcao = '';
                     if(data.imagem) {
                         opcao += `
-                            <div id="opcao_${data.id}" class="row align-middle opcao imagem-container ${data.correta && 'bg-lime'}">
+                            <div id="opcao_${data.id}" class="row align-middle opcao imagem-container ${data.correta ? 'bg-gradient-success' : 'bg-gradient-info'}">
                                 <div class="col-8">
                                     <img class="imagem" src="/imagens/opcoes/${data.texto}"/>
                                 </div>
@@ -371,7 +378,7 @@
                         `;
                     } else {
                         opcao += `
-                            <div id="opcao_${data.id}" class="row opcao ${data.correta && 'bg-lime'}">
+                            <div id="opcao_${data.id}" class="row opcao ${data.correta ? 'bg-gradient-success' : 'bg-gradient-info'}">
                                 <div class="col-8">${data.texto}</div>
                                 <div class="col-1">${data.correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
                                 <div class="col-3">
@@ -747,7 +754,7 @@
                 if(questao.opcoes[i]) {
                     if(questao.opcoes[i].imagem) {
                         opcao += `
-                            <div id="opcao_${questao.opcoes[i].id}" class="row align-middle opcao imagem-container ${questao.opcoes[i].correta && 'bg-lime'}">
+                            <div id="opcao_${questao.opcoes[i].id}" class="row align-middle opcao imagem-container ${questao.opcoes[i].correta ? 'bg-gradient-success' : 'bg-gradient-info'}">
                                 <div class="col-8">
                                     <img class="imagem" src="/imagens/opcoes/${questao.opcoes[i].texto}"/>
                                 </div>
@@ -762,7 +769,7 @@
                         `;
                     } else {
                         opcao += `
-                            <div id="opcao_${questao.opcoes[i].id}" class="row opcao ${questao.opcoes[i].correta && 'bg-lime'}">
+                            <div id="opcao_${questao.opcoes[i].id}" class="row opcao ${questao.opcoes[i].correta ? 'bg-gradient-success' : 'bg-gradient-info'}">
                                 <div class="col-8">${questao.opcoes[i].texto}</div>
                                 <div class="col-1">${questao.opcoes[i].correta ? '<i class="fas fa-check-circle"></i>' : ''}</div>
                                 <div class="col-3">
