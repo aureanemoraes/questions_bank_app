@@ -6,7 +6,6 @@
 @stop
 
 @section('content_header')
-    <h1>Caderno de questões {{$caderno_questao->id}} - Detalhes</h1>
 @stop
 
 @section('content')
@@ -18,10 +17,15 @@
         @endif
         <div class="card card-primary">
             <div class="card-header">
-                <h3 class="card-title">{!! nl2br(e($caderno_questao->titulo)) !!}</h3>
-                <h4 class="text-muted">{!! nl2br(e($caderno_questao->informacoes_adicionais)) !!}</h4>
+                <h3 class="card-title">Caderno de questões {{$caderno_questao->id}} - Detalhes</h3>
             </div>
             <div class="card-body">
+                    <div class="info-box">
+                        <div class="info-box-content">
+                            <span class="info-box-number">{!! nl2br(e($caderno_questao->titulo)) !!}</span>
+                            <span><em>{!! nl2br(e($caderno_questao->informacoes_adicionais)) !!}</em></span>
+                        </div>
+                    </div>
                 <div class="info-box">
                     <div class="info-box-content">
                         <span class="info-box-text">Privacidade</span>
@@ -133,7 +137,9 @@
 
             </div>
             <div class="card-footer">
-                <a type="button" class="btn btn-sm btn-warning" href="{{route('cadernos_questoes.edit', $caderno_questao)}}">Editar</a>
+                @if($caderno_questao->user_id == auth()->user()->id)
+                    <a type="button" class="btn btn-sm btn-warning" href="{{route('cadernos_questoes.edit', $caderno_questao)}}">Editar</a>
+                @endif
             </div>  
         </div>
     </div>

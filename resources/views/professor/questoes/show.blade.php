@@ -93,7 +93,7 @@
             @if($opcao->correta)
             <div class="small-box bg-gradient-success">
                 <div class="inner">
-                    <h4>{{$letra}})</h4>
+                    <h5>{{$letra}})</h5>
                     @if(file_exists(public_path() . '/imagens/opcoes/' . $opcao->texto))
                         <img src="{{ asset("imagens/opcoes/$opcao->texto") }}" alt="a" class="img"/>
                     @else
@@ -107,7 +107,7 @@
             @else
             <div class="small-box bg-gradient-info">
                 <div class="inner">
-                    <h4>{{$letra}})</h4>
+                    <h5>{{$letra}})</h5>
                     @if(file_exists(public_path() . '/imagens/opcoes/' . $opcao->texto))
                         <img src="{{ asset("imagens/opcoes/$opcao->texto") }}" alt="a" class="img"/>
                     @else
@@ -195,7 +195,9 @@
     </div>
     <div class="row">
         <div class="col">
-            <a type="button" class="btn btn-warning" href="{{route('questoes.edit', $questao)}}">Editar</a>
+            @if($questao->user_id == auth()->user()->id)
+                <a type="button" class="btn btn-warning" href="{{route('questoes.edit', $questao)}}">Editar</a>
+            @endif
         </div>
         <div class="col" align="right">
             <a type="button" class="btn btn-primary" onclick="adicionarEmUmCqModal()"><i class="fas fa-plus-circle"></i> Caderno de questões</a>

@@ -27,9 +27,9 @@
 
             <div class="form-group mb-3">
                 <div class="input-group-prepend">
-                    <label for="info_adicional">Informações adicionais</label>
+                    <label for="informacoes_adicionais">Informações adicionais</label>
                 </div>
-                <textarea name="info_adicional" id="info_adicional" class="form-control" aria-label="info_adicional" rows="4" placeholder="Informações adicionais..."></textarea>
+                <textarea name="informacoes_adicionais" id="informacoes_adicionais" class="form-control" aria-label="informacoes_adicionais" rows="4" placeholder="Informações adicionais..."></textarea>
             </div>
 
             <div class="form-group mb-3">

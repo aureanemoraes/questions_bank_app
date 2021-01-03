@@ -65,12 +65,50 @@ class CadernosQuestoesController extends Controller
 
     public function edit($id)
     {
-        //
+        $caderno_questao = CadernoQuestao::find($id);
+        return view('professor.cadernos_questoes.edit', compact('caderno_questao'));
     }
 
     public function update(Request $request, $id)
     {
-        //
+        $caderno_questao = CadernoQuestao::find($id);
+
+        $data_inicial = Carbon::createFromFormat('d/m/Y', $request->data_inicial);
+        $data_final = Carbon::createFromFormat('d/m/Y', $request->data_final);
+        $duracao = Carbon::createFromFormat('H:i:s', $request->duracao);
+
+        $backup_qtde_questoes = $caderno_questao->quantidade_questoes;
+        $backup_nota_maxima = $caderno_questao->nota_maxima;
+
+        $caderno_questao->fill([
+            'titulo' => $request->titulo,
+            'informacoes_adicionais' => $request->informacoes_adicionais,
+            'data_inicial' => $data_inicial,
+            'data_final' => $data_final,
+            'duracao' => $duracao,
+            'quantidade_questoes' => $request->quantidade_questoes,
+            'nota_maxima' => $request->nota_maxima,
+            'tipo' => $request->tipo,
+            'categoria' => $request->categoria,
+            'privacidade' => $request->privacidade,
+            'cq_enem_id' => $request->cq_enem_id
+        ]);
+        $caderno_questao->save();
+
+        // recalcular os valores das questões
+        if(($backup_qtde_questoes != $caderno_questao->quantidade_questoes) || ($backup_nota_maxima != $caderno_questao->nota_maxima)) {
+            if($caderno_questao->quantidade_questoes > $caderno_questao->nota_maxima) {
+                $valor_questao = $caderno_questao->quantidade_questoes/$caderno_questao->nota_maxima;
+            } else {
+                $valor_questao = $caderno_questao->nota_maxima/$caderno_questao->quantidade_questoes;
+            }
+
+            foreach($caderno_questao->questoes as $questao) {
+                $caderno_questao->questoes()->sync([$questao->id => ['valor' => $valor_questao]]);
+            }
+        }
+
+        return redirect()->route('cadernos_questoes.show', [$caderno_questao]);
     }
     
     public function destroy($id)
