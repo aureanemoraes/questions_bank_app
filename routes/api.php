@@ -23,6 +23,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/matrizes', 'Api\MatrizesController@opcoes');
 Route::get('/componentes', 'Api\ComponentesController@opcoes');
 Route::get('/assuntos', 'Api\AssuntosController@opcoes');
+Route::get('/alunos', 'Api\AlunosController@opcoes');
 Route::get('/cadernos_questoes/{user_id}', 'Api\CadernosQuestoesController@listarCadernosQuestoesPorAutor');
 Route::post('/assuntos', 'Api\AssuntosController@store');
 Route::post('/imagens', 'Api\ImagemController@store');

@@ -38,6 +38,8 @@
                 </select>
             </div>
 
+            <div class="form-group mb-3" id="alunos_selecionados"></div>
+
             <div class="row">
                 <div class="col">
                     <div class="form-group mb-3">
@@ -125,7 +127,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
     
-    <script>
+<script>
         // Validação
         jQuery.validator.setDefaults({
             errorElement: 'div',
@@ -192,6 +194,48 @@
             ],
             "firstDay": 1
         };
+
+        //funçoes
+        function carregarOpcoes(url, id) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function(data) {
+                    let opcoes = [];
+                    data.forEach(element => {
+                        opcoes.push({
+                            id: element.id,
+                            text: `${element.cpf} - ${element.name}`
+                        });
+                    });
+                    
+                    $(`#${id}`).select2({
+                        placeholder: 'Selecione...',
+                        theme: 'classic',
+                        width: '100%',
+                        height: '100%',
+                        multiple: true,
+                        data: opcoes
+                    });
+                }
+            });
+        }
+
+        //onchange
+        $('#privacidade').on('change', function() {
+            let privacidade_selecionada = $('#privacidade').val();
+            if(privacidade_selecionada == 'Restrito') {
+                $('#alunos_selecionados').html(`
+                    <label for="alunos">Alunos*</label>
+                    <select class="form-control" id="alunos" name="alunos">
+                    </select>
+                `);
+                carregarOpcoes('/api/alunos', 'alunos');
+            } else {
+                $('#alunos_selecionados').html('');
+            }
+        });
+
         // data inicial data final
         $('#data_inicial, #data_final').daterangepicker({
             "locale": pt_br_daterangepicker,

@@ -52,6 +52,10 @@ class CadernosQuestoesController extends Controller
             'cq_enem_id' => $request->cq_enem_id,
             'user_id' => Auth::id()
         ]);
+        
+        if($request->alunos) {
+            $caderno_questao->alunos()->attach($request->alunos);
+        }
 
         return redirect()->route('cadernos_questoes.show', [$caderno_questao]);
     }
@@ -66,6 +70,7 @@ class CadernosQuestoesController extends Controller
     public function edit($id)
     {
         $caderno_questao = CadernoQuestao::find($id);
+        $caderno_questao->load('alunos');
         return view('professor.cadernos_questoes.edit', compact('caderno_questao'));
     }
 
@@ -94,6 +99,12 @@ class CadernosQuestoesController extends Controller
             'cq_enem_id' => $request->cq_enem_id
         ]);
         $caderno_questao->save();
+
+        if($request->alunos) {
+            $caderno_questao->alunos()->sync($request->alunos);
+        } else {
+            $caderno_questao->alunos()->detach();
+        }
 
         // recalcular os valores das questões
         if(($backup_qtde_questoes != $caderno_questao->quantidade_questoes) || ($backup_nota_maxima != $caderno_questao->nota_maxima)) {

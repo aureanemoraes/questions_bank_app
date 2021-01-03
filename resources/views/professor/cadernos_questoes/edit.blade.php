@@ -40,6 +40,8 @@
                 </select>
             </div>
 
+            <div class="form-group mb-3" id="alunos_selecionados"></div>
+
             <div class="row">
                 <div class="col">
                     <div class="form-group mb-3">
@@ -159,22 +161,29 @@
         }
     });
 
-    $('#editar_questao').validate({
+    $('#editar_cq').validate({
         rules: {
-            comando: "required",
-            tipo_resposta: "required",
-            nivel_dificuldade: "required",
-            matriz_id: "required",
-            componente_id: "required",
-            assunto_id: "required",
+            titulo: "required",
+            privacidade: "required",
+            data_inicial: "required",
+            data_final: "required",
+            duracao: "required",
+            quantidade_questoes: "required",
+            nota_maxima: "required",
+            tipo: "required",
+            categoria: "required",
         },
         messages: {
-            comando: "Por favor, insira um <b>comando</b>.",
-            tipo_resposta: "Por favor, selecione um <b>tipo de resposta</b>.",
-            nivel_dificuldade: "Por favor, selecione um <b>nível de dificuldade</b>.",
-            matriz_id: "Por favor, selecione uma <b>matriz</b>.",
-            componente_id: "Por favor, selecione um <b>vomponente</b>.",
-            assunto_id: "Por favor, selecione um <b>assunto</b>.",
+            titulo: "Por favor, insira um <b>título</b>.",
+            privacidade: "Por favor, selecione uma <b>privacidade</b>.",
+            data_inicial: "Por favor, selecione uma <b>data inicial</b>.",
+            data_final: "Por favor, selecione uma <b>data final</b>.",
+            duracao: "Por favor, selecione uma <b>duracao</b>.",
+            quantidade_questoes: "Por favor, insira uma <b>quantidade de questões</b>.",
+            nota_maxima: "Por favor, insira uma <b>nota máxima</b>.",
+            tipo: "Por favor, selecione um <b>tipo</b>.",
+            categoria: "Por favor, selecione uma <b>categoria</b>.",
+
         }
     });
 
@@ -231,35 +240,56 @@
     });
 
 
-    let questao = JSON.parse($('#caderno_questao').val());
+    let caderno_questao = JSON.parse($('#caderno_questao').val());
 
     // função
     function carregarOpcoes(url, id) {
         $.ajax({
             type: 'GET',
             url: url,
-            success: function(opcoes) {
-                opcoes.forEach(element => {
-                    if(element.id == questao[id]) {
-                        element.selected = true;
-                    }
+            success: function(data) {
+                let opcoes = [];
+                data.forEach(element => {
+                    opcoes.push({
+                        id: element.id,
+                        text: `${element.cpf} - ${element.name}`
+                    });
                 });
 
+                opcoes.forEach(element => {
+                    caderno_questao.alunos.forEach(aluno => {
+                        if(element.id == aluno.id) {
+                            element.selected = true;
+                        }
+                    });
+                });
+                
                 $(`#${id}`).select2({
+                    placeholder: 'Selecione...',
                     theme: 'classic',
                     width: '100%',
                     height: '100%',
-                    data: [{
-                        id: '',
-                        text: 'Selecione...',
-                        selected: true,
-                        disabled: true
-                    }, ...opcoes]
+                    multiple: true,
+                    data: opcoes
                 });
             }
         });
     }
 
+    //onchange
+    $('#privacidade').on('change', function() {
+        let privacidade_selecionada = $('#privacidade').val();
+        if(privacidade_selecionada == 'Restrito') {
+            $('#alunos_selecionados').html(`
+                <label for="alunos">Alunos*</label>
+                <select class="form-control" id="alunos" name="alunos">
+                </select>
+            `);
+            carregarOpcoes('/api/alunos', 'alunos');
+        } else {
+            $('#alunos_selecionados').html('');
+        }
+    });
 
     $(function() {
         // Privacidade
@@ -291,6 +321,16 @@
             height: '100%',
             data: privacidade_data
         });
+
+        //alunos
+        if(caderno_questao.privacidade == 'Restrito') {
+            $('#alunos_selecionados').html(`
+                <label for="alunos">Alunos*</label>
+                <select class="form-control" id="alunos" name="alunos">
+                </select>
+            `);
+            carregarOpcoes('/api/alunos', 'alunos');
+        }
 
         // tipo
         let tipo_data = [
@@ -364,8 +404,12 @@
         ];
 
         categoria_data.forEach(element => {
-            if(element.text == caderno_questao.categoria) {
-                element.selected = true;
+            if(element.children) {
+                element.children.forEach(element => {
+                    if(element.id == caderno_questao.categoria) {
+                        element.selected = true;
+                    }
+                });
             }
         });
 
@@ -377,5 +421,5 @@
         });
 
     });
-</script>
+    </script>
 @stop

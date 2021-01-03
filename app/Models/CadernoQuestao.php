@@ -20,13 +20,19 @@ class CadernoQuestao extends Model
         'categoria',
         'privacidade',
         'cq_enem_id',
-        'user_id'
+        'user_id',
+        'aluno'
     ];
 
     // relacionamentos
     public function questoes()
     {
-        return $this->belongsToMany('App\Models\Questao', 'questoes_caderno_questoes')->withPivot('valor');
+        return $this->belongsToMany('App\Models\Questao', 'questoes_caderno_questoes')->withPivot('valor')->withTimestamps();;
+    }
+
+    public function alunos()
+    {
+        return $this->belongsToMany('App\User', 'alunos_cadernos_questoes')->withPivot(['situacao', 'nota'])->withTimestamps();;
     }
 
     public function autor() {

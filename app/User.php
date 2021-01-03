@@ -40,4 +40,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    //relacionamentos
+    public function cadernos_questoes()
+    {
+        return $this->belongsToMany('App\Models\CadernoQuestao', 'alunos_cadernos_questoes')->withPivot(['situacao', 'nota'])->withTimestamps();;
+    }
 }
