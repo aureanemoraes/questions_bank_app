@@ -273,6 +273,12 @@ return [
                 ]
             ],
         ],
+        ['header' => 'Estudante'],
+        [
+            'text' => 'Cadernos de Questões',
+            'url'  => '/estudante/cadernos_questoes',
+            'icon' => 'fas fa-fw fa-user',
+        ],
     ],
 
     /*
