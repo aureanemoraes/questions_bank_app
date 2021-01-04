@@ -24,7 +24,7 @@ class Questao extends Model
 
     public function opcoes()
     {
-        return $this->hasMany('App\Models\Opcao');
+        return $this->hasMany('App\Models\Opcao')->inRandomOrder();
     }
     
     public function imagens()

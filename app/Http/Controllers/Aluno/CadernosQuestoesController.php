@@ -39,6 +39,55 @@ class CadernosQuestoesController extends Controller
 
     public function showAvaliation($id)
     {
-        return view('aluno.cadernos_questoes.avaliation');
+        $aluno = User::find(Auth::id());
+        $caderno_questao = $aluno->cadernos_questoes()->where('caderno_questao_id', $id)->first();
+        return view('aluno.cadernos_questoes.avaliation', compact('caderno_questao'));
+    }
+
+    public function salvarRespostas($caderno_questao_id, Request $request) {
+        $aluno = User::find(Auth::id());
+        $caderno_questao = $aluno->cadernos_questoes()->where('caderno_questao_id', $caderno_questao_id)->first();
+
+        foreach($caderno_questao->questoes as $questao) {
+            switch($questao->tipo_resposta) {
+                case 'Única Escolha':
+                    foreach($questao->opcoes as $opcao) {
+                        if($opcao->correta) {
+                            if(isset($request->resposta[$questao->id][$opcao->id])) {
+                                // está correta // dar os pontos
+                                $antiga_nota = $caderno_questao->pivot->nota;
+                                $nota_questao = $questao->pivot->valor;
+                                $nova_nota = $antiga_nota + $nova_questao;
+                                $caderno_questao->alunos()->sync([$aluno => ['nota' => $nova_nota]]);
+                            }
+                        }
+                    }
+                    break;
+                case 'Múltipla Escolha':
+                    foreach($questao->opcoes as $opcao) {
+                        $opcoes_corretas = 0;
+                        $acertos = 0;
+                        if($opcao->correta) {
+                            if(isset($request->resposta[$questao->id][$opcao->id])) {
+                                // está correta // dar os pontos
+                                $acertos++;
+                            }
+                            $opcoes_corretas++;
+                        }
+                    }
+                    if($opcoes_corretas == $acertos) {
+                        $antiga_nota = $caderno_questao->pivot->nota;
+                        $nota_questao = $questao->pivot->valor;
+                        $nova_nota = $antiga_nota + $nova_questao;
+
+                        $caderno_questao->alunos()->sync([$aluno => ['nota' => $nova_nota]]);
+                    }
+                    break;
+                case 'Discursiva':
+                    break;
+            }
+        }
+
+        return 1;
     }
 }

@@ -28,6 +28,8 @@ Route::get('/home', function() {
 Route::get('cadernos_questoes/pre-create', function() {
     return view('professor.cadernos_questoes.pre-create');
 });
+Route::post('estudante/cadernos_questoes/{cq_id}', 'Aluno\CadernosQuestoesController@salvarRespostas')->name('aluno_cq.store');
+
 Route::get('estudante/responder/caderno_questao/{id}', 'Aluno\CadernosQuestoesController@showAvaliation')->name('aluno_cq.avaliation');
 
 Route::get('estudante/cadernos_questoes', 'Aluno\CadernosQuestoesController@index');

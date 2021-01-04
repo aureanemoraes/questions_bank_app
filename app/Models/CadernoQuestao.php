@@ -23,7 +23,8 @@ class CadernoQuestao extends Model
         'privacidade',
         'cq_enem_id',
         'user_id',
-        'aluno'
+        'aluno',
+        'reposta'
     ];
 
     // relacionamentos
@@ -33,12 +34,12 @@ class CadernoQuestao extends Model
 
     public function questoes()
     {
-        return $this->belongsToMany('App\Models\Questao', 'questoes_caderno_questoes')->withPivot('valor')->withTimestamps();;
+        return $this->belongsToMany('App\Models\Questao', 'questoes_caderno_questoes')->withPivot('valor')->withTimestamps()->inRandomOrder();
     }
 
     public function alunos()
     {
-        return $this->belongsToMany('App\User', 'alunos_cadernos_questoes')->withPivot(['situacao', 'nota'])->withTimestamps();;
+        return $this->belongsToMany('App\User', 'alunos_cadernos_questoes')->withPivot(['situacao', 'nota'])->withTimestamps();
     }
 
     
