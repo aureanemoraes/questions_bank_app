@@ -22,7 +22,8 @@ class CreateTableAlunosCadernosQuestoes extends Migration
             $table->unsignedBigInteger('caderno_questao_id');
             $table->foreign('caderno_questao_id')->references('id')->on('cadernos_questoes');
             $table->string('situacao')->default('aberto'); // aberto, iniciado, finalizado
-            $table->integer('nota')->nullable(); // nota lançada após a situação do caderno mudar para finalizado // se o caderno for publico, somente instanciar nesta tabela, qndo o aluno finalizar o caderno.
+            $table->float('nota')->nullable(); // nota lançada após a situação do caderno mudar para finalizado // se o caderno for publico, somente instanciar nesta tabela, qndo o aluno finalizar o caderno.
+            $table->datetime('started_at')->nullable();
             $table->timestamps();
         });
     }

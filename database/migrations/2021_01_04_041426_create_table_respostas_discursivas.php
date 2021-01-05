@@ -16,6 +16,10 @@ class CreateTableRespostasDiscursivas extends Migration
         Schema::create('respostas_discursivas', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->longText('texto');
+            # questao
+            $table->unsignedBigInteger('questao_id');
+            $table->foreign('questao_id')->references('id')->on('questoes');
         });
     }
 

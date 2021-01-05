@@ -87,13 +87,75 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col">
+                        <div class="info-box">
+                            <div class="info-box-content">
+                                <span class="info-box-text">Situacao</span>
+                                @if(isset($caderno_questao->pivot->situacao))
+                                    <span class="info-box-number">{{ucfirst($caderno_questao->pivot->situacao)}}</span>
+                                @else
+                                    <span class="info-box-number">Aberto</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="info-box">
+                            <div class="info-box-content">
+                                <span class="info-box-text">Nota alcançada</span>
+                                @if(isset($caderno_questao->pivot->situacao) && ($caderno_questao->pivot->situacao == 'finalizado'))
+                                    <span class="info-box-number">{{$caderno_questao->pivot->nota}}</span>
+                                @else
+                                    <span class="info-box-number">Não avaliado</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="card-footer">
-                @if($caderno_questao->pivot->situacao == 'aberto')
-                    <a type="button" class="btn btn-success" onclick="iniciarAvaliacao({{$caderno_questao->id}})">Iniciar</a>
-                @elseif($caderno_questao->pivot->situacao == 'iniciado')
-                    <a type="button" class="btn btn-warning" onclick="iniciarAvaliacao({{$caderno_questao->id}})">Continuar</a>
+                <!-- Disponível somente se: situação estiver em 'aberto' ou 'iniciado' e, se estiver entre a data inicial e a final, e se a duração não estiver esgotada.-->
+                <!-- Quando a duração esgotar, enviar o formulário.-->
+                <!-- Se for um caderno público, quando o usuário clickar em iniciar avaliação, criar o registro dele natabela alunos_cadernos_questoes-->
+                @php
+                    if(isset($caderno_questao->pivot->started_at)) {
+                        $started_at = Carbon\Carbon::parse($caderno_questao->pivot->started_at);
+                        $duracao_hora = Carbon\Carbon::parse($caderno_questao->duracao)->format('H');
+                        $duracao_minuto = Carbon\Carbon::parse($caderno_questao->duracao)->format('i');
+                        $duracao_segundo = Carbon\Carbon::parse($caderno_questao->duracao)->format('s');
+                        $duracao = Carbon\Carbon::parse($caderno_questao->duracao);
+
+                        $started_at->addHours($duracao_hora);
+                        $started_at->addMinutes($duracao_minuto);
+                        $started_at->addSeconds($duracao_segundo);
+
+                        $duracao_valida = $started_at->diffInSeconds(now(), false);
+
+
+                        //$teste = $started_at + $duracao;
+                        //$started_at->addHours()
+                        //$diferenca_duracao = Carbon\Carbon::parse($caderno_questao->pivot->started_at)->diff(now(), false)->format('%H:%I:%S');
+                        //$duracao_valida = Carbon\Carbon::parse($caderno_questao->duracao)->diffInSeconds($diferenca_duracao, false);
+
+                    }
+                    $diferenca = Carbon\Carbon::parse($caderno_questao->data_inicial)->diffInHours(now(), false);
+
+                @endphp
+                @if(isset($diferenca) && ($diferenca > 0))
+                    @if(isset($duracao_valida) && ($duracao_valida < 0))
+                        @if(isset($caderno_questao->pivot->situacao))
+                            @if($caderno_questao->pivot->situacao == 'aberto')
+                                <a type="button" class="btn btn-success" onclick="iniciarAvaliacao({{$caderno_questao->id}}, {{auth()->user()->id}})">Iniciar</a>
+                            @elseif($caderno_questao->pivot->situacao == 'iniciado')
+                                <a type="button" class="btn btn-warning" onclick="iniciarAvaliacao({{$caderno_questao->id}}, {{auth()->user()->id}})">Continuar</a>
+                            @endif
+                        @endif
+                    
+                    @endif
                 @endif
+                
             </div>  
         </div>
     </div>
@@ -105,7 +167,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <script>
-        function iniciarAvaliacao(caderno_questao_id) {
+        function iniciarAvaliacao(caderno_questao_id, aluno_id) {
             Swal.fire({
                 title: 'Confirmação',
                 text: "Ao prosseguir, você confirma que leu todas as instruções e está pronto para iniciar avaliação.",
@@ -117,7 +179,13 @@
                 cancelButtonText: 'Não confirmo.'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.open(`/estudante/responder/caderno_questao/${caderno_questao_id}`, '_blank');
+                    $.ajax({
+                        type: "POST",
+                        url: `/api/cadernos_questoes/${caderno_questao_id}/${aluno_id}`,
+                        success: function() {
+                            window.open(`/estudante/responder/caderno_questao/${caderno_questao_id}`, '_blank');
+                        },
+                    });
                 }
             })
         }

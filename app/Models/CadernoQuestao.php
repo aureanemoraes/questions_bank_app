@@ -39,7 +39,7 @@ class CadernoQuestao extends Model
 
     public function alunos()
     {
-        return $this->belongsToMany('App\User', 'alunos_cadernos_questoes')->withPivot(['situacao', 'nota'])->withTimestamps();
+        return $this->belongsToMany('App\User', 'alunos_cadernos_questoes')->withPivot(['situacao', 'nota', 'started_at'])->withTimestamps();
     }
 
     

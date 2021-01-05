@@ -21,7 +21,7 @@ class CreateCadernoDeQuestaoTable extends Migration
             $table->date('data_final');
             $table->time('duracao');
             $table->integer('quantidade_questoes');
-            $table->integer('nota_maxima');
+            $table->float('nota_maxima');
             $table->string('tipo'); // PROVA OU SIMULADO
             $table->string('categoria'); // ENEM ou EJA
             $table->string('privacidade'); // PÚBLICO OU RESTRITO

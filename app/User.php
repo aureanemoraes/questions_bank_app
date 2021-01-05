@@ -44,6 +44,6 @@ class User extends Authenticatable
     //relacionamentos
     public function cadernos_questoes()
     {
-        return $this->belongsToMany('App\Models\CadernoQuestao', 'alunos_cadernos_questoes')->withPivot(['situacao', 'nota'])->withTimestamps();;
+        return $this->belongsToMany('App\Models\CadernoQuestao', 'alunos_cadernos_questoes')->withPivot(['situacao', 'nota', 'started_at'])->withTimestamps();;
     }
 }

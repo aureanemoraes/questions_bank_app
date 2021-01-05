@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CadernoQuestao;
 use Illuminate\Support\Facades\Auth;
+use App\User;
+use Carbon\Carbon;
 
 
 class CadernosQuestoesController extends Controller
@@ -47,5 +49,20 @@ class CadernosQuestoesController extends Controller
         //$assuntos = Assunto::select('id', 'nome AS text')->get();
         $cadernos_questoes = CadernoQuestao::select('id', 'titulo AS text')->where('user_id',$user_id )->orderByDesc('created_at')->get();
         return $cadernos_questoes;
+    }
+
+    public function adicionarAluno($caderno_questao_id, $aluno_id) {
+        $user = User::find($aluno_id);
+        $caderno_questao = $user->cadernos_questoes()->where('caderno_questao_id', $caderno_questao_id)->first();
+
+        if(!$caderno_questao) {
+            $user->cadernos_questoes()->attach([$caderno_questao_id => ['started_at' => Carbon::now()]]);
+        } else {
+            if($caderno_questao->pivot->started_at == null) {
+                $user->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['started_at' => Carbon::now()]);
+            }
+        }
+
+        return 1;
     }
 }
