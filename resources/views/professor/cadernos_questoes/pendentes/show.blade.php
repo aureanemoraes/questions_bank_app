@@ -113,8 +113,8 @@
                         </div>
                     </div>
                 </div>
-                <form action="{{route('cadernos_questoes.pendentes.update', $caderno_questao)}}">
-                    
+                <form action="{{route('cadernos_questoes.pendentes.update', $caderno_questao)}}" method="POST"> 
+                        @csrf
                             <h5>Questões pendentes de correção</h5>
                                 @if(count($caderno_questao->questoes) > 0)
                                     @foreach($caderno_questao->questoes as $questao) 
@@ -130,7 +130,7 @@
                                                                     <div class="input-group-prepend">
                                                                         <label for="nota_questao_{{$questao->id}}">Nota*</label>
                                                                     </div>
-                                                                    <input type="number" name="nota_questao_{{$questao->id}}" id="nota_questao_{{$questao->id}}" class="form-control" aria-label="nota_questao_{{$questao->id}}" placeholder="Nota..."/>
+                                                                    <input type="number" name="nota_questao[{{$questao->id}}]" id="nota_questao_{{$questao->id}}" class="form-control" aria-label="nota_questao_{{$questao->id}}" placeholder="Nota..."/>
                                                                     <small class="form-text text-muted">A nota máxima para essa questão é: <strong>{{$questao->pivot->valor}}</strong></small>
 
                                                                 </div>
@@ -143,6 +143,7 @@
                                     @endforeach
                                 @endif
                                 
+                                <input type="hidden" name="aluno_id" value="{{$caderno_questao->pivot->user_id}}">
                     
                     <div class="form-group mb-3" align="right">
                         <a type="button" class="btn btn-default">Cancelar</a>

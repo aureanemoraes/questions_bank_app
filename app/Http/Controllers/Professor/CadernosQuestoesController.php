@@ -48,16 +48,22 @@ class CadernosQuestoesController extends Controller
         return view('professor.cadernos_questoes.pendentes.show', compact('caderno_questao'));
     }
 
-    public function updateGrade($id) {
-        $caderno_questao = CadernoQuestao::find($id);
+    public function updateGrade($caderno_questao_id, Request $request) {
+        $aluno = User::find($request->aluno_id);
+        $caderno_questao = $aluno->cadernos_questoes()->where('caderno_questao_id', $caderno_questao_id)->first();
+        $nota = $caderno_questao->pivot->nota;
+
+        //$caderno_questao = CadernoQuestao::find($id);
         if(count($caderno_questao->questoes) > 0) {
             foreach($caderno_questao->questoes as $questao) {
                 if($questao->tipo_resposta == 'Discursiva') {
-                    
+                    $nota += $request->nota_questao[$questao->id];
+                    $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['nota' => $nota]);
                 }
             }
+            $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['situacao' => 'finalizado']);
         }
-        return view('professor.cadernos_questoes.pendentes.show', compact('caderno_questao'));
+        return redirect()->route('cadernos_questoes_pendentes.index');
     }
 
     public function create()
