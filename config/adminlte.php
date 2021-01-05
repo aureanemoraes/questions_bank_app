@@ -224,18 +224,12 @@ return [
     */
 
     'menu' => [
-        ['header' => 'Configurações de conta'],
+        ['header' => 'Administrador'],
         [
-            'text' => 'Perfil',
-            'url'  => 'admin/settings',
+            'text' => 'Gerenciar usuários',
+            'url'  => '/admin',
             'icon' => 'fas fa-fw fa-user',
         ],
-        [
-            'text' => 'Mudar senha',
-            'url'  => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
-        
         ['header' => 'Professor'],
         [
             'text'    => 'Questões',
@@ -266,6 +260,10 @@ return [
                 [
                     'text' => 'Todos',
                     'url'  => '/cadernos_questoes',
+                ],
+                [
+                    'text' => 'Pendentes de correção',
+                    'url'  => '/cadernos_questoes/pendentes',
                 ],
                 [
                     'text' => 'Novo',

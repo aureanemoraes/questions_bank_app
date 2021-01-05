@@ -27,6 +27,9 @@ class CadernosQuestoesController extends Controller
         // verificar os cadernos de questões publicos e adicionar a variavel
         $cadernos_questoes_publicos = CadernoQuestao::where('privacidade', 'Público')->whereNotIn('id', $ids)->get();
 
+        // fechar o caderno se ele tiver passado do prazo IMPLEMENTAR
+       // $diferenca_dias_data_final = Carbon\Carbon::parse($caderno_questao->data_final)->diffInDays(now(), false);
+
         return view('aluno.cadernos_questoes.index', compact('cadernos_questoes', 'cadernos_questoes_publicos'));
     }
 
@@ -55,21 +58,18 @@ class CadernosQuestoesController extends Controller
         $caderno_questao = $aluno->cadernos_questoes()->where('caderno_questao_id', $caderno_questao_id)->first();
 
         if($caderno_questao->pivot->situacao == 'aberto') {
+            $nota = $caderno_questao->pivot->nota;
             foreach($caderno_questao->questoes as $questao) {
                 switch($questao->tipo_resposta) {
                     case 'Única Escolha':
                         foreach($questao->opcoes as $opcao) {
                             if($opcao->correta) {
-                                if(isset($request->resposta[$questao->id][$opcao->id])) {
-                                    // está correta // dar os pontos
-                                    $antiga_nota = $caderno_questao->pivot->nota;
-                                    $nota_questao = $questao->pivot->valor;
-                                    $nova_nota = $antiga_nota + $nota_questao;
-                                    //$aluno->cadernos_questoes()->sync([$caderno_questao->id => ['nota' => $nova_nota]]);
-
-                                    //$employee->requirements()->updateExistingPivot($requirement->id, $attributes);
-                                    $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['nota' => $nova_nota]);
-
+                                if(isset($request->resposta_unica_escolha)) {
+                                    if($request->resposta_unica_escolha == "resposta[$questao->id][$opcao->id]"){
+                                        // está correta // dar os pontos
+                                        $nota += $questao->pivot->valor;
+                                    }
+                                    
                                 }
                             }
                         }
@@ -79,23 +79,20 @@ class CadernosQuestoesController extends Controller
                         $acertos = 0;
                         foreach($questao->opcoes as $opcao) {
                             if($opcao->correta) {
+                                $opcoes_corretas++;
                                 if(isset($request->resposta[$questao->id][$opcao->id])) {
                                     // está correta // dar os pontos
                                     $acertos++;
                                 }
-                                $opcoes_corretas++;
                             }
                         }
+                        //dd($opcoes_corretas, $acertos);
                         if($opcoes_corretas == $acertos) {
-                            $antiga_nota = $caderno_questao->pivot->nota;
-                            $nota_questao = $questao->pivot->valor;
-                            $nova_nota = $antiga_nota + $nota_questao;
-    
-                            $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['nota' => $nova_nota]);
+                            $nota += $questao->pivot->valor;
                         }
                         break;
                     case 'Discursiva':
-                        if($request->resposta[$questao->id]['texto']) {
+                        if(isset($request->resposta_discursiva[$questao->id]['texto'])) {
                             RespostaDiscursiva::create([
                                 'texto' => $request->resposta[$questao->id]['texto'],
                                 'questao_id' => $questao->id
@@ -109,6 +106,9 @@ class CadernosQuestoesController extends Controller
                         break;
                 }
             }
+
+            $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['nota' => $nota]);
+
     
             if($caderno_questao->pivot->situacao == 'aberto') {
                 $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['situacao' => 'finalizado']);

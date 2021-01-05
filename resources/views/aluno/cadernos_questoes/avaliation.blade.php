@@ -20,6 +20,7 @@
 @stop
 
 @section('content')
+    @if($caderno_questao->pivot->situacao == 'aberto')
     <div class="container">
         <input type="hidden" id="caderno_questao" value="{{$caderno_questao}}">
         <div class="card card-primary">
@@ -47,17 +48,25 @@
                                 </div>
                                 <div class="card-body">
                                     @if($questao->tipo_resposta == 'Única Escolha')
+                                        @if(count($questao->imagens) > 0)
+                                            @foreach($questao->imagens as $imagem)
+                                                <div align="center">
+                                                    <img src="{{ asset("imagens/questoes/$imagem->caminho") }}" alt="{{$imagem->caminho}}" />
+                                                    <p><em>{{$imagem->legenda}}</em></p>
+                                                </div>
+                                            @endforeach
+                                        @endif
                                         @foreach($questao->opcoes as $opcao)
                                             @if($opcao->imagem)
                                                 <div class="form-check mb-3">
-                                                    <input class="form-check-input" type="radio" name="resposta[{{$questao->id}}][{{$opcao->id}}]">
+                                                    <input class="form-check-input" type="radio" name="resposta_unica_escolha" value="resposta[{{$questao->id}}][{{$opcao->id}}]">
                                                     <label class="form-check-label" for="alternativa_{{$opcao->id}}">
                                                         <img src="{{ asset("imagens/opcoes/$opcao->texto") }}" alt="{{$opcao->texto}}" />
                                                     </label>
                                                 </div>
                                             @else
                                                 <div class="form-check mb-3">
-                                                    <input class="form-check-input" type="radio" name="resposta[{{$questao->id}}][{{$opcao->id}}]">
+                                                    <input class="form-check-input" type="radio" name="resposta_unica_escolha"  value="resposta[{{$questao->id}}][{{$opcao->id}}]">
                                                     <label class="form-check-label" for="alternativa_{{$opcao->id}}">
                                                         {{$opcao->texto}}
                                                     </label>
@@ -67,6 +76,14 @@
                                             @php $letra++; @endphp
                                         @endforeach
                                     @elseif($questao->tipo_resposta == 'Múltipla Escolha')
+                                        @if(count($questao->imagens) > 0)
+                                            @foreach($questao->imagens as $imagem)
+                                                <div align="center">
+                                                    <img src="{{ asset("imagens/questoes/$imagem->caminho") }}" alt="{{$imagem->caminho}}" />
+                                                    <p><em>{{$imagem->legenda}}</em></p>
+                                                </div>
+                                            @endforeach
+                                        @endif
                                         @foreach($questao->opcoes as $opcao)
                                             @if($opcao->imagem)
                                                 <div class="form-check mb-3">
@@ -87,7 +104,7 @@
                                         @endforeach
                                     @else 
                                         <div class="form-group">
-                                            <textarea class="form-control" name="resposta[{{$questao->id}}][texto]" id="alternativa_{{$questao->id}}" rows="3" placeholder="Responda aqui..."></textarea>
+                                            <textarea class="form-control" name="resposta_discursiva[{{$questao->id}}][texto]" id="alternativa_{{$questao->id}}" rows="3" placeholder="Responda aqui..."></textarea>
                                         </div>
                                     @endif
                                 </div>
@@ -101,6 +118,7 @@
             </form>
         </div>
     </div>
+    @endif
 @stop
 
 

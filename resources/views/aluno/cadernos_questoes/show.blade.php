@@ -140,21 +140,28 @@
                         //$duracao_valida = Carbon\Carbon::parse($caderno_questao->duracao)->diffInSeconds($diferenca_duracao, false);
 
                     }
-                    $diferenca = Carbon\Carbon::parse($caderno_questao->data_inicial)->diffInHours(now(), false);
+                    $diferenca_dias_data_inicial = Carbon\Carbon::parse($caderno_questao->data_inicial)->diffInDays(now(), false);
+                    $diferenca_horas_data_inicial = Carbon\Carbon::parse($caderno_questao->data_inicial)->diffInHours(now(), false);
+
+                    $diferenca_dias_data_final = Carbon\Carbon::parse($caderno_questao->data_final)->diffInDays(now(), false);
 
                 @endphp
-                @if(isset($diferenca) && ($diferenca > 0))
-                    @if(isset($duracao_valida) && ($duracao_valida < 0))
-                        @if(isset($caderno_questao->pivot->situacao))
-                            @if($caderno_questao->pivot->situacao == 'aberto')
-                                <a type="button" class="btn btn-success" onclick="iniciarAvaliacao({{$caderno_questao->id}}, {{auth()->user()->id}})">Iniciar</a>
-                            @elseif($caderno_questao->pivot->situacao == 'iniciado')
-                                <a type="button" class="btn btn-warning" onclick="iniciarAvaliacao({{$caderno_questao->id}}, {{auth()->user()->id}})">Continuar</a>
+
+                @if(isset($diferenca_dias_data_inicial) && ($diferenca_dias_data_inicial == 0) && isset($diferenca_horas_data_inicial) && ($diferenca_horas_data_inicial > 0))
+                    @if(isset($diferenca_dias_data_final) && ($diferenca_dias_data_final <= 0))
+                        @if(isset($caderno_questao->pivot->started_at))
+                            @if($duracao_valida < 0 )
+                                @if(isset($caderno_questao->pivot->situacao) && ($caderno_questao->pivot->situacao == 'aberto'))
+                                    <a type="button" class="btn btn-warning" onclick="iniciarAvaliacao({{$caderno_questao->id}}, {{auth()->user()->id}})">Continuar</a>
+                                @endif
                             @endif
+                        @else
+                            <a type="button" class="btn btn-success" onclick="iniciarAvaliacao({{$caderno_questao->id}}, {{auth()->user()->id}})">Iniciar</a>
                         @endif
-                    
                     @endif
                 @endif
+
+               
                 
             </div>  
         </div>

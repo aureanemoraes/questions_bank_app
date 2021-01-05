@@ -56,7 +56,7 @@
                         <div class="input-group-prepend">
                             <label for="data_final">Data Final*</label>
                         </div>
-                        <input type="text" name="data_final" id="data_final" class="form-control" aria-label="data_final" placeholder="Data final..." value="{{date('d/m/Y', strtotime($caderno_questao->data_inicial))}}"/>
+                        <input type="text" name="data_final" id="data_final" class="form-control" aria-label="data_final" placeholder="Data final..." value="{{date('d/m/Y', strtotime($caderno_questao->data_final))}}"/>
                     </div>
                 </div>
                 <div class="col">

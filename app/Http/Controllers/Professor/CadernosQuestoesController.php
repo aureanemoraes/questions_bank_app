@@ -27,6 +27,21 @@ class CadernosQuestoesController extends Controller
         return view('professor.cadernos_questoes.index', compact('cadernos_questoes'));
     }
 
+    public function indexPendentes()
+    {
+        //$cadernos_questoes = CadernoQuestao::all();
+        $cadernos_questoes = CadernoQuestao::whereHas('alunos', function ($query) {
+            return $query->where('situacao', '=', 'pendente');
+        })->get();
+        //dd($cadernos_questoes);
+        return view('professor.cadernos_questoes.pendentes.index', compact('cadernos_questoes'));
+    }
+
+    public function showPendentes($id) {
+        $caderno_questao = CadernoQuestao::find($id);
+        return view('professor.cadernos_questoes.pendentes.show', compact('caderno_questao'));
+    }
+
     public function create()
     {
         return view('professor.cadernos_questoes.create');

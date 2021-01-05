@@ -34,7 +34,14 @@ Route::post('estudante/cadernos_questoes/teste/{cq_id}', 'Aluno\CadernosQuestoes
 Route::get('estudante/responder/caderno_questao/{id}', 'Aluno\CadernosQuestoesController@showAvaliation')->name('aluno_cq.avaliation');
 Route::get('questoes/minhas', 'Professor\QuestoesController@my_index');
 Route::resource('questoes', 'Professor\QuestoesController');
+Route::get('cadernos_questoes/pendentes', 'Professor\CadernosQuestoesController@indexPendentes');
+Route::get('cadernos_questoes/pendentes/{id}', 'Professor\CadernosQuestoesController@showPendentes');
+Route::post('cadernos_questoes/pendentes', 'Professor\CadernosQuestoesController@updateGrade');
+
+
+
 Route::get('cadernos_questoes/meus', 'Professor\CadernosQuestoesController@my_index');
 
 Route::resource('cadernos_questoes', 'Professor\CadernosQuestoesController');
+
 

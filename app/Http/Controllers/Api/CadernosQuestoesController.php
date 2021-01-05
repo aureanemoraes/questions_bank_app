@@ -56,7 +56,7 @@ class CadernosQuestoesController extends Controller
         $caderno_questao = $user->cadernos_questoes()->where('caderno_questao_id', $caderno_questao_id)->first();
 
         if(!$caderno_questao) {
-            $user->cadernos_questoes()->attach([$caderno_questao_id => ['started_at' => Carbon::now()]]);
+            $user->cadernos_questoes()->attach([$caderno_questao_id => ['started_at' => Carbon::now(), 'situacao' => 'aberto']]);
         } else {
             if($caderno_questao->pivot->started_at == null) {
                 $user->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['started_at' => Carbon::now()]);
