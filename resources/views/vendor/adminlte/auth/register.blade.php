@@ -17,6 +17,22 @@
     <form action="{{ $register_url }}" method="post">
         {{ csrf_field() }}
 
+        {{-- Cpf field --}}
+        <div class="input-group mb-3">
+            <input type="text" name="cpf" class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+                   value="{{ old('cpf') }}" placeholder="Cpf" autofocus>
+            <div class="input-group-append">
+                <div class="input-group-text">
+                    <span class="fas fa-user {{ config('adminlte.classes_auth_icon', '') }}"></span>
+                </div>
+            </div>
+            @if($errors->has('cpf'))
+                <div class="invalid-feedback">
+                    <strong>{{ $errors->first('cpf') }}</strong>
+                </div>
+            @endif
+        </div>
+
         {{-- Name field --}}
         <div class="input-group mb-3">
             <input type="text" name="name" class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}"

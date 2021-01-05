@@ -28,6 +28,12 @@ Route::get('/home', function() {
 Route::get('cadernos_questoes/pre-create', function() {
     return view('professor.cadernos_questoes.pre-create');
 });
+Route::get('admin/users', 'Admin\UsuariosController@index');
+Route::get('admin/users/{id}', 'Admin\UsuariosController@edit')->name('users.edit');
+Route::put('admin/users/{id}', 'Admin\UsuariosController@update')->name('users.update');
+
+
+
 Route::get('estudante/cadernos_questoes', 'Aluno\CadernosQuestoesController@index');
 Route::get('estudante/cadernos_questoes/{id}', 'Aluno\CadernosQuestoesController@show')->name('aluno_cq.show');
 Route::post('estudante/cadernos_questoes/teste/{cq_id}', 'Aluno\CadernosQuestoesController@salvarRespostas')->name('aluno_cq.salvar');
@@ -35,14 +41,9 @@ Route::get('estudante/responder/caderno_questao/{id}', 'Aluno\CadernosQuestoesCo
 Route::get('questoes/minhas', 'Professor\QuestoesController@my_index');
 Route::resource('questoes', 'Professor\QuestoesController');
 Route::get('cadernos_questoes/pendentes', 'Professor\CadernosQuestoesController@indexPendentes')->name('cadernos_questoes_pendentes.index');
-
 Route::get('cadernos_questoes/pendentes/{cq_id}/{user_id}', 'Professor\CadernosQuestoesController@showPendentes')->name('cadernos_questoes_pendentes.show');;
 Route::post('cadernos_questoes/pendentes/{cq_id}', 'Professor\CadernosQuestoesController@updateGrade')->name('cadernos_questoes.pendentes.update');
-
-
-
 Route::get('cadernos_questoes/meus', 'Professor\CadernosQuestoesController@my_index');
-
 Route::resource('cadernos_questoes', 'Professor\CadernosQuestoesController');
 
 

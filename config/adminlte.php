@@ -227,7 +227,7 @@ return [
         ['header' => 'Administrador'],
         [
             'text' => 'Gerenciar usuários',
-            'url'  => '/admin',
+            'url'  => '/admin/users',
             'icon' => 'fas fa-fw fa-user',
             'user_type' => 'administrador',
         ],
