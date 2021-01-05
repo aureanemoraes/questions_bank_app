@@ -1,4 +1,10 @@
+@php
+    use Illuminate\Support\Facades\Auth;
+    $user = Auth::user();
+@endphp
+
 <li @if(isset($item['id'])) id="{{ $item['id'] }}" @endif class="nav-item has-treeview {{ $item['submenu_class'] }}">
+@if(isset($item['user_type']) && ($item['user_type'] == $user->user_type))
 
     {{-- Menu toggler --}}
     <a class="nav-link {{ $item['class'] }} @if(isset($item['shift'])) {{ $item['shift'] }} @endif"
@@ -9,7 +15,7 @@
         }}"></i>
 
         <p>
-            {{ $item['text'] }}
+                {{ $item['text'] }}
             <i class="fas fa-angle-left right"></i>
 
             @if(isset($item['label']))
@@ -25,5 +31,6 @@
     <ul class="nav nav-treeview">
         @each('adminlte::partials.sidebar.menu-item', $item['submenu'], 'item')
     </ul>
+    @endif
 
 </li>

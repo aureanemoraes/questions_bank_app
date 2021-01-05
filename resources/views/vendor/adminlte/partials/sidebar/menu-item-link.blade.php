@@ -1,4 +1,10 @@
+@php
+    use Illuminate\Support\Facades\Auth;
+    $user = Auth::user();
+@endphp
+
 <li @if(isset($item['id'])) id="{{ $item['id'] }}" @endif class="nav-item">
+@if(isset($item['user_type']) && ($item['user_type'] == $user->user_type))
 
     <a class="nav-link {{ $item['class'] }} @if(isset($item['shift'])) {{ $item['shift'] }} @endif"
        href="{{ $item['href'] }}" @if(isset($item['target'])) target="{{ $item['target'] }}" @endif
@@ -19,5 +25,6 @@
         </p>
 
     </a>
+    @endif
 
 </li>

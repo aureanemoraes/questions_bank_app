@@ -229,45 +229,55 @@ return [
             'text' => 'Gerenciar usuários',
             'url'  => '/admin',
             'icon' => 'fas fa-fw fa-user',
+            'user_type' => 'administrador',
         ],
         ['header' => 'Professor'],
         [
             'text'    => 'Questões',
             'icon'    => 'fas fa-fw fa-question-circle',
+            'user_type' => 'professor',
             'submenu' => [
                 [
                     'text' => 'Minhas',
                     'url'  => '/questoes/minhas',
+                    'user_type' => 'professor',
                 ],
                 [
                     'text' => 'Todas',
                     'url'  => '/questoes',
+                    'user_type' => 'professor',
                 ],
                 [
                     'text' => 'Nova',
                     'url'  => '/questoes/create',
+                    'user_type' => 'professor',
                 ]
             ],
         ],
         [
             'text'    => 'Cadernos de Questões',
             'icon'    => 'fas fa-fw fa-book',
+            'user_type' => 'professor',
             'submenu' => [
                 [
                     'text' => 'Meus',
                     'url'  => '/cadernos_questoes/meus',
+                    'user_type' => 'professor',
                 ],
                 [
                     'text' => 'Todos',
                     'url'  => '/cadernos_questoes',
+                    'user_type' => 'professor',
                 ],
                 [
                     'text' => 'Pendentes de correção',
                     'url'  => '/cadernos_questoes/pendentes',
+                    'user_type' => 'professor',
                 ],
                 [
                     'text' => 'Novo',
                     'url'  => '/cadernos_questoes/pre-create',
+                    'user_type' => 'professor',
                 ]
             ],
         ],
@@ -276,6 +286,7 @@ return [
             'text' => 'Cadernos de Questões',
             'url'  => '/estudante/cadernos_questoes',
             'icon' => 'fas fa-fw fa-user',
+            'user_type' => 'estudante',
         ],
     ],
 
