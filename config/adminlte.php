@@ -276,7 +276,7 @@ return [
                 ],
                 [
                     'text' => 'Novo',
-                    'url'  => '/cadernos_questoes/pre-create',
+                    'url'  => '/cadernos_questoes/create',
                     'user_type' => 'professor',
                 ]
             ],

@@ -53,19 +53,21 @@
                 <tbody>
                     @foreach($estudantes as $estudante)
                         @foreach($estudante->cadernos_questoes as $caderno_questao)
-                        <tr id={{"caderno_questao_$caderno_questao->id"}}>
-                            <td>{{$caderno_questao->id}}</td>
-                            <td>{{$caderno_questao->titulo}}</td>
-                            <td>{{date('d/m/Y', strtotime($caderno_questao->data_inicial))}}</td>
-                            <td>{{date('d/m/Y', strtotime($caderno_questao->data_final))}}</td>
-                            <td>{{$caderno_questao->tipo}}</td>
-                            <td>{{$caderno_questao->categoria}}</td>
-                            <td>{{$caderno_questao->privacidade}}</td>
-                            <td>{{$estudante->name}}</td>
-                            <td>
-                                <a type="button" class="btn btn-sm btn-info" href="{{route('cadernos_questoes_pendentes.show', ['cq_id' => $caderno_questao, 'user_id' => $estudante->id])}}">Ver</a>
-                            </td>
-                        </tr>
+                            @if($caderno_questao->pivot->situacao == 'pendente')
+                            <tr id={{"caderno_questao_$caderno_questao->id"}}>
+                                <td>{{$caderno_questao->id}}</td>
+                                <td>{{$caderno_questao->titulo}}</td>
+                                <td>{{date('d/m/Y', strtotime($caderno_questao->data_inicial))}}</td>
+                                <td>{{date('d/m/Y', strtotime($caderno_questao->data_final))}}</td>
+                                <td>{{$caderno_questao->tipo}}</td>
+                                <td>{{$caderno_questao->categoria}}</td>
+                                <td>{{$caderno_questao->privacidade}}</td>
+                                <td>{{$estudante->name}}</td>
+                                <td>
+                                    <a type="button" class="btn btn-sm btn-info" href="{{route('cadernos_questoes_pendentes.show', ['cq_id' => $caderno_questao, 'user_id' => $estudante->id])}}">Ver</a>
+                                </td>
+                            </tr>
+                            @endif
                         @endforeach
                     @endforeach
                 </tbody>
@@ -78,7 +80,7 @@
                         <th></th>
                         <th></th>
                         <th></th>
-                        <th></th>
+                        <th class="pesquisavel"></th>
                         <th></th>
                 </tfoot>
             </table>
@@ -127,7 +129,7 @@
 
 
         $(document).ready(function(d) {
-            var theadname = ['Título', 'Data inicial', 'Data final'];
+            var theadname = ['Título', 'Data inicial', 'Data final', 'Estudante'];
 
             $('.pesquisavel').each( function (d) {
                 var title = $(this).text();
@@ -140,7 +142,7 @@
                 },
                 "columnDefs": [
                     {
-                        "targets": [2, 3, 6, 7],
+                        "targets": [2, 3, 6],
                         "visible": false
                     }
                 ],

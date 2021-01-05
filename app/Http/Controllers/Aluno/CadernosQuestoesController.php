@@ -127,6 +127,6 @@ class CadernosQuestoesController extends Controller
         }
         
 
-        return 'a';
+        return redirect()->route('aluno_cq.index'); 
     }
 }

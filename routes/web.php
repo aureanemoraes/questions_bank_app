@@ -25,16 +25,14 @@ Route::get('/home', function() {
     return view('home');
 })->name('home')->middleware('auth');
 
-Route::get('cadernos_questoes/pre-create', function() {
-    return view('professor.cadernos_questoes.pre-create');
-});
+
 Route::get('admin/users', 'Admin\UsuariosController@index');
 Route::get('admin/users/{id}', 'Admin\UsuariosController@edit')->name('users.edit');
 Route::put('admin/users/{id}', 'Admin\UsuariosController@update')->name('users.update');
 
 
 
-Route::get('estudante/cadernos_questoes', 'Aluno\CadernosQuestoesController@index');
+Route::get('estudante/cadernos_questoes', 'Aluno\CadernosQuestoesController@index')->name('aluno_cq.index');
 Route::get('estudante/cadernos_questoes/{id}', 'Aluno\CadernosQuestoesController@show')->name('aluno_cq.show');
 Route::post('estudante/cadernos_questoes/teste/{cq_id}', 'Aluno\CadernosQuestoesController@salvarRespostas')->name('aluno_cq.salvar');
 Route::get('estudante/responder/caderno_questao/{id}', 'Aluno\CadernosQuestoesController@showAvaliation')->name('aluno_cq.avaliation');
