@@ -64,8 +64,8 @@ class CadernosQuestoesController extends Controller
                     case 'Única Escolha':
                         foreach($questao->opcoes as $opcao) {
                             if($opcao->correta) {
-                                if(isset($request->resposta_unica_escolha)) {
-                                    if($request->resposta_unica_escolha == "resposta[$questao->id][$opcao->id]"){
+                                if(isset($request->resposta_unica_escolha[$questao->id])) {
+                                    if($request->resposta_unica_escolha[$questao->id] == "resposta[$questao->id][$opcao->id]"){
                                         // está correta // dar os pontos
                                         $nota += $questao->pivot->valor;
                                     }
@@ -94,11 +94,12 @@ class CadernosQuestoesController extends Controller
                     case 'Discursiva':
                         if(isset($request->resposta_discursiva[$questao->id]['texto'])) {
                             RespostaDiscursiva::create([
-                                'texto' => $request->resposta[$questao->id]['texto'],
-                                'questao_id' => $questao->id
+                                'texto' => $request->resposta_discursiva[$questao->id]['texto'],
+                                'questao_id' => $questao->id,
+                                'user_id' => $aluno->id,
+                                'caderno_questao_id' => $caderno_questao_id
                             ]);
-                            $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['situacao' => 'pendente']);
-
+                            $resposta_discursiva = true;
                            // $aluno->cadernos_questoes()->sync([$caderno_questao->id => ['situacao' => 'pendente']]);
 
                            // $caderno_questao->alunos()->sync([$aluno->id => ['situacao' => 'pendente']]);
@@ -111,7 +112,13 @@ class CadernosQuestoesController extends Controller
 
     
             if($caderno_questao->pivot->situacao == 'aberto') {
-                $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['situacao' => 'finalizado']);
+                if(isset($resposta_discursiva)) {
+                    $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['situacao' => 'pendente']);
+
+                } else {
+                    $aluno->cadernos_questoes()->updateExistingPivot($caderno_questao->id, ['situacao' => 'finalizado']);
+
+                }
 
                 //$aluno->cadernos_questoes()->sync([$caderno_questao->id => ['situacao' => 'pendente']]);
                 //$caderno_questao->alunos()->sync([$aluno->id => ['situacao' => 'Finalizado']]);

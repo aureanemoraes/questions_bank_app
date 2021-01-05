@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\CadernoQuestao;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\User;
 
 class CadernosQuestoesController extends Controller
 {
@@ -30,15 +31,32 @@ class CadernosQuestoesController extends Controller
     public function indexPendentes()
     {
         //$cadernos_questoes = CadernoQuestao::all();
-        $cadernos_questoes = CadernoQuestao::whereHas('alunos', function ($query) {
+        $estudantes = User::whereHas('cadernos_questoes', function ($query) {
             return $query->where('situacao', '=', 'pendente');
         })->get();
-        //dd($cadernos_questoes);
-        return view('professor.cadernos_questoes.pendentes.index', compact('cadernos_questoes'));
+        
+       // dd($estudantes);
+        return view('professor.cadernos_questoes.pendentes.index', compact('estudantes'));
     }
 
-    public function showPendentes($id) {
+    public function showPendentes($cq_id, $user_id) {
+        $estudante = User::find($user_id);
+        $caderno_questao = $estudante->cadernos_questoes()
+                            ->where('caderno_questao_id', $cq_id)
+                            ->first();
+
+        return view('professor.cadernos_questoes.pendentes.show', compact('caderno_questao'));
+    }
+
+    public function updateGrade($id) {
         $caderno_questao = CadernoQuestao::find($id);
+        if(count($caderno_questao->questoes) > 0) {
+            foreach($caderno_questao->questoes as $questao) {
+                if($questao->tipo_resposta == 'Discursiva') {
+                    
+                }
+            }
+        }
         return view('professor.cadernos_questoes.pendentes.show', compact('caderno_questao'));
     }
 
@@ -91,6 +109,10 @@ class CadernosQuestoesController extends Controller
 
     public function update(Request $request, $id)
     {
+        $validatedData = $request->validate([
+            'alunos' => 'array'
+        ]);
+
         $caderno_questao = CadernoQuestao::find($id);
 
         $data_inicial = Carbon::createFromFormat('d/m/Y', $request->data_inicial);
@@ -114,9 +136,11 @@ class CadernosQuestoesController extends Controller
             'cq_enem_id' => $request->cq_enem_id
         ]);
         $caderno_questao->save();
+        //dd($request->alunos);
 
         if($request->alunos) {
-            $caderno_questao->alunos()->sync($request->alunos);
+            $caderno_questao->alunos()->attach($request->alunos);
+
         } else {
             $caderno_questao->alunos()->detach();
         }

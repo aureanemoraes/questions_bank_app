@@ -56,7 +56,7 @@
                         <div class="input-group-prepend">
                             <label for="data_final">Data Final*</label>
                         </div>
-                        <input type="text" name="data_final" id="data_final" class="form-control" aria-label="data_final" placeholder="Data final..." value="{{date('d/m/Y', strtotime($caderno_questao->data_final))}}"/>
+                        <input type="text" name="data_final" id="data_final" class="form-control" aria-label="data_final" placeholder="Data final..." value="{{date('d/m/Y', strtotime($caderno_questao->data_inicial))}}"/>
                     </div>
                 </div>
                 <div class="col">
@@ -282,7 +282,7 @@
         if(privacidade_selecionada == 'Restrito') {
             $('#alunos_selecionados').html(`
                 <label for="alunos">Alunos*</label>
-                <select class="form-control" id="alunos" name="alunos">
+                <select class="form-control" id="alunos" name="alunos[]">
                 </select>
             `);
             carregarOpcoes('/api/alunos', 'alunos');
@@ -326,7 +326,7 @@
         if(caderno_questao.privacidade == 'Restrito') {
             $('#alunos_selecionados').html(`
                 <label for="alunos">Alunos*</label>
-                <select class="form-control" id="alunos" name="alunos">
+                <select class="form-control" id="alunos" name="alunos[]">
                 </select>
             `);
             carregarOpcoes('/api/alunos', 'alunos');

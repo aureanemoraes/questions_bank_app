@@ -35,8 +35,8 @@ Route::get('estudante/responder/caderno_questao/{id}', 'Aluno\CadernosQuestoesCo
 Route::get('questoes/minhas', 'Professor\QuestoesController@my_index');
 Route::resource('questoes', 'Professor\QuestoesController');
 Route::get('cadernos_questoes/pendentes', 'Professor\CadernosQuestoesController@indexPendentes');
-Route::get('cadernos_questoes/pendentes/{id}', 'Professor\CadernosQuestoesController@showPendentes');
-Route::post('cadernos_questoes/pendentes', 'Professor\CadernosQuestoesController@updateGrade');
+Route::get('cadernos_questoes/pendentes/{cq_id}/{user_id}', 'Professor\CadernosQuestoesController@showPendentes')->name('cadernos_questoes_pendentes.show');;
+Route::post('cadernos_questoes/pendentes', 'Professor\CadernosQuestoesController@updateGrade')->name('cadernos_questoes.pendentes.update');
 
 
 

@@ -20,6 +20,13 @@ class CreateTableRespostasDiscursivas extends Migration
             # questao
             $table->unsignedBigInteger('questao_id');
             $table->foreign('questao_id')->references('id')->on('questoes');
+            # aluno
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            # cadernos_questoes
+            $table->unsignedBigInteger('caderno_questao_id');
+            $table->foreign('caderno_questao_id')->references('id')->on('cadernos_questoes');
+            
         });
     }
 

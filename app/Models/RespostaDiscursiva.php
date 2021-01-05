@@ -8,5 +8,5 @@ class RespostaDiscursiva extends Model
 {
     protected $table = 'respostas_discursivas';
 
-    protected $fillable = ['texto', 'questao_id'];
+    protected $fillable = ['texto', 'questao_id', 'user_id', 'caderno_questao_id'];
 }

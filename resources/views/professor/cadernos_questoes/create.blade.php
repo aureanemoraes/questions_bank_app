@@ -227,7 +227,7 @@
             if(privacidade_selecionada == 'Restrito') {
                 $('#alunos_selecionados').html(`
                     <label for="alunos">Alunos*</label>
-                    <select class="form-control" id="alunos" name="alunos">
+                    <select class="form-control" id="alunos" name="alunos[]">
                     </select>
                 `);
                 carregarOpcoes('/api/alunos', 'alunos');

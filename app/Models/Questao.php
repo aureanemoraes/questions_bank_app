@@ -27,9 +27,9 @@ class Questao extends Model
         return $this->hasMany('App\Models\Opcao')->inRandomOrder();
     }
 
-    public function resposta_discursiva()
+    public function respostas_discursivas()
     {
-        return $this->hasOne('App\Models\RespostaDiscursiva');
+        return $this->hasMany('App\Models\RespostaDiscursiva');
     }
     
     public function imagens()

@@ -31,7 +31,7 @@
             <a type="button" class="btn btn-primary toggle-vis" data-column="4">Tipo</a>
             <a type="button" class="btn btn-primary toggle-vis" data-column="5">Categoria</a>
             <a type="button" class="btn btn-primary toggle-vis" data-column="6">Privacidade</a>
-            <a type="button" class="btn btn-primary toggle-vis" data-column="7">Autor</a>
+            <a type="button" class="btn btn-primary toggle-vis" data-column="7">Estudante</a>
             <a type="button" class="btn btn-primary toggle-vis" data-column="8">Ações</a>
 
         </div>
@@ -46,26 +46,27 @@
                         <th>Tipo</th>
                         <th>Categoria</th>
                         <th>Privacidade</th>
-                        <th>Autor</th>
+                        <th>Estudante</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($cadernos_questoes as $caderno_questao)
-                    <tr id={{"caderno_questao_$caderno_questao->id"}}>
-                        <td>{{$caderno_questao->id}}</td>
-                        <td>{{$caderno_questao->titulo}}</td>
-                        <td>{{date('d/m/Y', strtotime($caderno_questao->data_inicial))}}</td>
-                        <td>{{date('d/m/Y', strtotime($caderno_questao->data_final))}}</td>
-                        <td>{{$caderno_questao->tipo}}</td>
-                        <td>{{$caderno_questao->categoria}}</td>
-                        <td>{{$caderno_questao->privacidade}}</td>
-                        <td>{{$caderno_questao->autor->name}}</td>
-                        <td>
-                            <a type="button" class="btn btn-sm btn-info" href="{{route('cadernos_questoes.show', $caderno_questao)}}">Ver</a>
-                            <a type="button" class="btn btn-sm btn-danger" onclick="excluirCadernoQuestao({{$caderno_questao->id}})">Excluir</a>
-                        </td>
-                    </tr>
+                    @foreach($estudantes as $estudante)
+                        @foreach($estudante->cadernos_questoes as $caderno_questao)
+                        <tr id={{"caderno_questao_$caderno_questao->id"}}>
+                            <td>{{$caderno_questao->id}}</td>
+                            <td>{{$caderno_questao->titulo}}</td>
+                            <td>{{date('d/m/Y', strtotime($caderno_questao->data_inicial))}}</td>
+                            <td>{{date('d/m/Y', strtotime($caderno_questao->data_final))}}</td>
+                            <td>{{$caderno_questao->tipo}}</td>
+                            <td>{{$caderno_questao->categoria}}</td>
+                            <td>{{$caderno_questao->privacidade}}</td>
+                            <td>{{$estudante->name}}</td>
+                            <td>
+                                <a type="button" class="btn btn-sm btn-info" href="{{route('cadernos_questoes_pendentes.show', ['cq_id' => $caderno_questao, 'user_id' => $estudante->id])}}">Ver</a>
+                            </td>
+                        </tr>
+                        @endforeach
                     @endforeach
                 </tbody>
                 <tfoot>
@@ -155,7 +156,7 @@
                             'Tipo',
                             'Categoria',
                             'Privacidade',
-                            'Autor',
+                            'Estudante',
                             'Ações'
                         ] //used this specify table name and head
                         var select = $('<select><option value="">' + theadname[d] + '</option></select>')
