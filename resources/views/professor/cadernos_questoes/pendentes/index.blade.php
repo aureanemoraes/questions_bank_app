@@ -53,21 +53,19 @@
                 <tbody>
                     @foreach($estudantes as $estudante)
                         @foreach($estudante->cadernos_questoes as $caderno_questao)
-                            @if($caderno_questao->pivot->situacao == 'pendente')
-                            <tr id={{"caderno_questao_$caderno_questao->id"}}>
-                                <td>{{$caderno_questao->id}}</td>
-                                <td>{{$caderno_questao->titulo}}</td>
-                                <td>{{date('d/m/Y', strtotime($caderno_questao->data_inicial))}}</td>
-                                <td>{{date('d/m/Y', strtotime($caderno_questao->data_final))}}</td>
-                                <td>{{$caderno_questao->tipo}}</td>
-                                <td>{{$caderno_questao->categoria}}</td>
-                                <td>{{$caderno_questao->privacidade}}</td>
-                                <td>{{$estudante->name}}</td>
-                                <td>
-                                    <a type="button" class="btn btn-sm btn-info" href="{{route('cadernos_questoes_pendentes.show', ['cq_id' => $caderno_questao, 'user_id' => $estudante->id])}}">Ver</a>
-                                </td>
-                            </tr>
-                            @endif
+                        <tr id={{"caderno_questao_$caderno_questao->id"}}>
+                            <td>{{$caderno_questao->id}}</td>
+                            <td>{{$caderno_questao->titulo}}</td>
+                            <td>{{date('d/m/Y', strtotime($caderno_questao->data_inicial))}}</td>
+                            <td>{{date('d/m/Y', strtotime($caderno_questao->data_final))}}</td>
+                            <td>{{$caderno_questao->tipo}}</td>
+                            <td>{{$caderno_questao->categoria}}</td>
+                            <td>{{$caderno_questao->privacidade}}</td>
+                            <td>{{$estudante->name}}</td>
+                            <td>
+                                <a type="button" class="btn btn-sm btn-info" href="{{route('cadernos_questoes_pendentes.show', ['cq_id' => $caderno_questao, 'user_id' => $estudante->id])}}">Ver</a>
+                            </td>
+                        </tr>
                         @endforeach
                     @endforeach
                 </tbody>
