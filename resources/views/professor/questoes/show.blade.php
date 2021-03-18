@@ -20,7 +20,7 @@
         }
 
         button {
-            margin: 2px;        
+            margin: 2px;
         }
 
         .opcao-correta {
@@ -53,6 +53,10 @@
 
         .small-box {
             height: fit-content !important;
+        }
+
+        .row {
+            vertical-align: middle;
         }
 
 
@@ -91,41 +95,40 @@
             @endphp
             @foreach($questao->opcoes as $opcao)
             @if($opcao->correta)
-            <div class="small-box bg-gradient-success">
-                <div class="inner">
-                    <h5>{{$letra}})</h5>
-                    @if(file_exists(public_path() . '/imagens/opcoes/' . $opcao->texto))
-                        <img src="{{ asset("imagens/opcoes/$opcao->texto") }}" alt="a" class="img"/>
-                    @else
-                        <p>{!! nl2br(e($opcao->texto)) !!}</p>
-                    @endif
+                <div class="row">
+                    <div class="col">
+                        @if(file_exists(public_path() . '/imagens/opcoes/' . $opcao->texto))
+                            <p>{{$letra}}) <img src="{{ asset("imagens/opcoes/$opcao->texto") }}" alt="a" class="img" width="80px" height="80px"/></p>
+                        @else
+                            <p>{{$letra}}) {!! nl2br(e($opcao->texto)) !!}</p>
+                        @endif
+                    </div>
+                    <div class="col-1">
+                        <i class="fas fa-check-circle" style="color: mediumseagreen"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-            </div>
             @else
-            <div class="small-box bg-gradient-info">
-                <div class="inner">
-                    <h5>{{$letra}})</h5>
-                    @if(file_exists(public_path() . '/imagens/opcoes/' . $opcao->texto))
-                        <img src="{{ asset("imagens/opcoes/$opcao->texto") }}" alt="a" class="img"/>
-                    @else
-                        <p>{!! nl2br(e($opcao->texto)) !!}</p>
-                    @endif
+                <div class="row">
+                    <div class="col">
+                        @if(file_exists(public_path() . '/imagens/opcoes/' . $opcao->texto))
+                            <p>{{$letra}}) <img src="{{ asset("imagens/opcoes/$opcao->texto") }}" alt="a" width="100px" height="50px"/></p>
+                        @else
+                            <p>{{$letra}}) {!! nl2br(e($opcao->texto)) !!}</p>
+                        @endif
+                    </div>
+                    <div class="col-1">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-times-circle"></i>
-                </div>
-            </div>
             @endif
 
             @php
                 $letra++;
             @endphp
             @endforeach
-        </div>    
+        </div>
     </div>
+
 
     <div class="card">
         <div class="card-header">

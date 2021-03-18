@@ -25,9 +25,6 @@ class CreateCadernoDeQuestaoTable extends Migration
             $table->string('tipo'); // PROVA OU SIMULADO
             $table->string('categoria'); // ENEM ou EJA
             $table->string('privacidade'); // PÚBLICO OU RESTRITO
-            #enem
-            $table->unsignedBigInteger('cq_enem_id')->nullable();
-            $table->foreign('cq_enem_id')->references('id')->on('cadernos_questoes_enem');
             # autor
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');

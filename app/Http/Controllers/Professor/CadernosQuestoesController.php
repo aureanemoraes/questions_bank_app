@@ -34,7 +34,7 @@ class CadernosQuestoesController extends Controller
         $estudantes = User::whereHas('cadernos_questoes', function ($query) {
             return $query->where('situacao', '=', 'pendente');
         })->get();
-        
+
        // dd($estudantes);
         return view('professor.cadernos_questoes.pendentes.index', compact('estudantes'));
     }
@@ -88,10 +88,9 @@ class CadernosQuestoesController extends Controller
             'tipo' => $request->tipo,
             'categoria' => $request->categoria,
             'privacidade' => $request->privacidade,
-            'cq_enem_id' => $request->cq_enem_id,
             'user_id' => Auth::id()
         ]);
-        
+
         if($request->alunos) {
             $caderno_questao->alunos()->attach($request->alunos);
         }
@@ -139,7 +138,6 @@ class CadernosQuestoesController extends Controller
             'tipo' => $request->tipo,
             'categoria' => $request->categoria,
             'privacidade' => $request->privacidade,
-            'cq_enem_id' => $request->cq_enem_id
         ]);
         $caderno_questao->save();
         //dd($request->alunos);
@@ -166,7 +164,7 @@ class CadernosQuestoesController extends Controller
 
         return redirect()->route('cadernos_questoes.show', [$caderno_questao]);
     }
-    
+
     public function destroy($id)
     {
         $cq = CadernoQuestao::find($id);
